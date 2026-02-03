@@ -16,3 +16,49 @@ body {
   line-height: 1.6;
   min-height: 100vh;
 }
+
+#logo {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 51.2px;
+  color: #6b9bd1;
+}
+.lucide-sparkles {
+  width: 32px;
+  height: 32px;
+  color: #f5bbcf;
+}
+p {
+  font-size: 16px;
+  line-height: 25.6px;
+  font-weight: 300;
+  color: #6b7785;
+}
+
+#button1,
+#button2,
+#button3 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #3a4556;
+  box-sizing: border-box;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: none;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button-icon {
+  width: 18px;
+  height: 18px;
+  color: #3a4556;
+}
