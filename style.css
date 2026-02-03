@@ -15,6 +15,13 @@ body {
   font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
+  background-color: #f7f9fb;
+}
+#header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
 }
 
 #logo {
@@ -22,6 +29,9 @@ body {
   font-weight: 600;
   line-height: 51.2px;
   color: #6b9bd1;
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 .lucide-sparkles {
   width: 32px;
@@ -61,4 +71,12 @@ p {
   width: 18px;
   height: 18px;
   color: #3a4556;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
