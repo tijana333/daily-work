@@ -1,0 +1,197 @@
+ŠTA SU TABOVI UOPŠTE?
+
+Tabovi su samo dugmad (Today, Overview, Entries)
+ i sekcije sadržaja koje se pokazuju ili sakrivaju.
+ U HTML-u:
+dugmad imaju klasu .tab
+sadržaji imaju klasu .tab-content
+<button class="tab" data-tab="today">Today</button>
+
+<section id="today-section" class="tab-content">
+  ...
+</section>Bitno pravilo:
+data-tab="today"id="today-section" Ime mora da se poklopi
+
+ KAKO IZGLEDA LOGIKA (u glavi)
+U svakom trenutku:
+1 tab je aktivan1 sadržaj je vidljivsvi ostali su skriveniTo se radi samo pomoću CSS klase active.
+
+ CSS – MAGIJA JE OVDJE (ALI JEDNOSTAVNA)
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+} Znači:
+ako nema active → ne vidi se
+ako ima active → vidi seIsto važi i za dugmad:
+
+.tab.active {
+  background: blue;
+}
+
+ ŠTA SE DESI KAD KLIKNEŠ TAB?
+Kad klikneš tab, JavaScript radi 3 stvari:
+
+ KORAK 1: Sluša klik
+
+const tabs = document.querySelectorAll(".tab");
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    TabManager.switchTab(tab.dataset.tab);
+  });
+}); Ovo znači:
+“Kad kliknem tab → pošalji njegovo ime (today, overview, entries)”
+
+ KORAK 2: Ukloni active sa SVIH tabova
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.classList.remove("active");
+}); Sad nijedan tab nije aktivan
+
+ KORAK 3: Dodaj active SAMO kliknutom
+
+tab.classList.add("active"); Sad je samo jedan tab plav
+
+ ISTA STVAR ZA SADRŽAJ (NAJBITNIJE)
+
+document.querySelectorAll(".tab-content").forEach(content => {
+  content.classList.remove("active");
+}); Sakrij SVE sekcije
+
+Onda prikaži TAČNO JEDNU
+
+document
+  .getElementById(`${tabName}-section`)
+  .classList.add("active");Ako je kliknut:
+tabName = "today"
+traži se: today-section
+
+ CIJELA FUNKCIJA – LJUDSKI PREVEDENA
+
+switchTab(tabName) {
+  // 1. Oboj tabove
+  ukloni active sa svih
+  dodaj active kliknutom
+
+  // 2. Sakrij sav sadržaj
+  ukloni active sa svih sekcija
+
+  // 3. Prikaži samo pravu sekciju
+  dodaj active onoj koja odgovara tabu
+}
+
+ ZAŠTO SE DODATNO POZIVAJU FUNKCIJE?
+Ovaj dio:
+
+if (tabName === "today") {
+  TodayForm.checkExistingEntry();
+} znači:
+“Kad otvorim tab → učitaj njegove podatke”Nije obavezno za tabove, nego za funkcionalnost aplikacije.
+
+ MINIMALNI TAB SISTEM (OD NULE)
+Ako ona pravi sama, ovo je najmanji mogući primjer:
+HTML
+
+<button class="tab active" data-tab="a">A</button>
+<button class="tab" data-tab="b">B</button>
+
+<div id="a-section" class="tab-content active">A content</div>
+<div id="b-section" class="tab-content">B content</div>CSS
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }JS
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab + "-section").classList.add("active");
+  });
+});[1:10 PM]Logika za ovaj feature je: “Kad kliknem dugme, JS samo pita:
+ koje dugme je kliknuto i koji sadržaj mu pripada.”
+
+------------------------------------------------------------
+ ŠTA JE UOPŠTE JS OVDJE?
+JavaScript ovdje radi 3 osnovne stvari:
+Pronađe elemente u HTML-uSluša klik mišaDodaje / skida CSS klaseNišta više.
+ Nema magije, nema frameworka.
+
+ PRVI KONCEPT: „UZMI NEŠTO IZ HTML-A“
+
+document.querySelectorAll(".tab"); Znači:
+“Nađi mi SVE elemente koji imaju klasu .tab”U HTML-u to su:
+
+<button class="tab">Today</button>
+<button class="tab">Overview</button>
+<button class="tab">Entries</button>Rezultat je lista dugmadi (ne jedno dugme, nego više).
+
+ ŠTA ZNAČI forEach?
+
+tabs.forEach(tab => {
+  ...
+}); Ljudski:
+“Za SVAKI tab uradi isto”Ako imaš 3 taba:
+prvi put → Todaydrugi put → Overviewtreći put → Entries
+
+ ŠTA JE addEventListener?
+
+tab.addEventListener("click", () => {
+  ...
+}); Ovo znači:
+“Hej browseru, kad korisnik klikne na ovo dugme – uradi nešto”Bez klika → JS ništa ne radi.
+
+ ŠTA JE OVA STVAR dataset.tab?
+HTML:
+
+<button class="tab" data-tab="today">Today</button>JS:
+
+tab.dataset.tab Ovo znači:
+“Uzmi vrijednost iz data-tab atributa”Rezultat:
+
+"today"Znači:
+klikne Today → "today"
+klikne Overview → "overview"
+
+ SADA GLAVNA FUNKCIJA: switchTab
+
+switchTab(tabName) { tabName je:
+"today""overview""entries"Zavisno šta je kliknuto.
+
+5.1  PRVO: OBOJI TABOVE
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.classList.toggle("active", tab.dataset.tab === tabName);
+});Prevedeno:
+ classList.toggle
+
+tab.classList.toggle("active", true); dodaj active
+
+tab.classList.toggle("active", false); ukloni active
+
+ OVA LINIJA ZNAČI:
+“Ako ime taba = kliknuto ime → aktivan
+ ako nije → nije aktivan”Tako se automatski gasi aktivni tab i pali novi.
+
+ DRUGI DIO: MIJENJANJE SADRŽAJA
+
+document.querySelectorAll(".tab-content").forEach(content => {
+  content.classList.toggle(
+    "active",
+    content.id === `${tabName}-section`
+  );
+});Ovo izgleda strašno, ali je jako jednostavno.
+
+6.1  ŠTA JE ${tabName}-section?
+Ako je:
+
+tabName = "today"onda:
+
+`${tabName}-section` === "today-section" To je ID sekcije u HTML-u:
+
+<section id="today-section">
