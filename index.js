@@ -9,7 +9,11 @@ document.querySelectorAll(".tab").forEach((tab) => {
   tab.classList.remove("active");
 });
 
-tab.classList.add("active");
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tab.classList.add("active");
+  });
+});
 
 document.querySelectorAll(".tab-content").forEach((content) => {
   content.classList.remove("active");
