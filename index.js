@@ -5,7 +5,7 @@ tabs.forEach(function (tab) {
       tbs.classList.remove("active");
     });
     tab.classList.add("active");
-
+    //volela bih objasnjenje i za ovaj deo(ovo sam guglala)
     const content = document.querySelectorAll(".tab-content");
     content.forEach((c) => c.classList.remove("active"));
 
