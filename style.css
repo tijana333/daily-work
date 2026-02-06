@@ -101,5 +101,6 @@ p {
 }
 
 .tab.active {
-  background: blue;
+  background-color: blue;
+  color: #ffffff;
 }
