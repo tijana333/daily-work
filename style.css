@@ -55,7 +55,6 @@ p {
   color: #3a4556;
   box-sizing: border-box;
   padding: 16px 24px;
-  /* background: #ffffff; */
   border-radius: 8px;
   border: none;
   font-family:
@@ -100,7 +99,30 @@ p {
   display: block;
 }
 
+.tab {
+  background: white;
+}
+
 .tab.active {
   background-color: blue;
   color: #ffffff;
+}
+
+h2 {
+  font-size: 28px;
+  color: #3a4556;
+  font-weight: 700;
+  text-align: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+p {
+  font-size: 16px;
+  color: #6b7785;
+  line-height: 25.6px;
+}
+
+.row {
+  text-align: center;
 }
