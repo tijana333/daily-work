@@ -200,3 +200,13 @@ label {
   gap: 8px;
   justify-content: center;
 }
+
+.intesity-button {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  max-width: 100px;
+  padding: 16px;
+  font-size: 15px;
+}
