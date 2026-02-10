@@ -69,14 +69,22 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition: color 0.2s ease;
 }
 
+.tab:not(.active):hover {
+  color: #3a4556;
+}
 .button-icon {
   width: 18px;
   height: 18px;
-  color: #3a4556;
+  color: #6b7785;
 }
-
+#button1 .button-icon,
+#button2 .button-icon,
+#button3 .button-icon {
+  color: currentColor;
+}
 .tabs {
   display: flex;
   flex-direction: row;
@@ -104,7 +112,7 @@ p {
 
 .tab {
   background: white;
-  color: #3a4556;
+  color: #6b7785;
 }
 
 .tab.active {
