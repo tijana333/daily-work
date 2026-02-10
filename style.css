@@ -148,3 +148,55 @@ h2 {
   align-items: center;
   gap: 8px;
 }
+
+#entry-form {
+  max-width: 600px;
+  background-color: #ffffff;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.character-count {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.label-icon {
+  height: 16px;
+  width: 16px;
+  color: #87c9ed;
+}
+
+label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #3a4556;
+  line-height: 1.5;
+}
+
+.button-form {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: center;
+}
