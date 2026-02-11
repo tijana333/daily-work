@@ -155,6 +155,8 @@ h2 {
   background-color: #ffffff;
   margin: 0 auto;
   padding: 32px;
+  border-radius: 8px;
+  border: 2px solid #e8edf2;
 }
 
 .form-label {
@@ -290,10 +292,6 @@ button:active {
   width: 24px;
   height: 24px;
   color: #ffffff;
-}
-
-.form-card {
-  border-radius: 8px;
 }
 
 @media (max-width: 600px) {
