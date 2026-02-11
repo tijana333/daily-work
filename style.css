@@ -261,6 +261,7 @@ button:active {
 .form-group textarea:focus {
   outline: none;
   border-color: #87c8ec;
+  color: black;
 }
 
 .button-form {
@@ -290,6 +291,11 @@ button:active {
   height: 24px;
   color: #ffffff;
 }
+
+.form-card {
+  border-radius: 8px;
+}
+
 @media (max-width: 600px) {
   .buttons {
     display: grid;
