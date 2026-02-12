@@ -60,11 +60,6 @@ p {
   padding: 16px 24px;
   border-radius: 8px;
   border: none;
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
 
   display: inline-flex;
   align-items: center;
@@ -224,8 +219,7 @@ label {
   border-color: #87c8ec;
   transform: translateY(-3px);
 }
-
-button:active {
+.button-form:active .intensity-button:active {
   transform: translateY(-1px);
 }
 .tab-number {
@@ -245,11 +239,6 @@ button:active {
   border-radius: 8px;
   border: 2px solid #e8edf2;
   font-size: 16px;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
   font-weight: 400;
   color: #3a4556;
 }
@@ -272,15 +261,10 @@ button:active {
   background-color: #509ed6;
   border: 1px solid #509ed6;
   font-size: 16px;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
   font-weight: 600;
   color: #ffffff;
   align-items: center;
-  box-shadow: 0 2px 6px #509ed6(0, 0, 0, 0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   transition: all 0.15s ease;
 }
 
