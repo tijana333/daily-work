@@ -17,6 +17,13 @@ body {
   min-height: 100vh;
   background-color: #f7f9fb;
 }
+
+input,
+textarea,
+button {
+  font-family: inherit;
+}
+
 #header-content {
   display: flex;
   flex-direction: column;
@@ -41,7 +48,7 @@ body {
 }
 p {
   font-size: 16px;
-  line-height: 25.6px;
+  line-height: 1.5;
   font-weight: 300;
   color: #6b7785;
   padding-left: 28px;
@@ -177,6 +184,9 @@ h2 {
 .character-count {
   display: flex;
   justify-content: flex-end;
+  font-size: 14px;
+  color: #a0aab8;
+  margin-top: 4px;
 }
 
 .label-icon {
@@ -186,7 +196,7 @@ h2 {
 }
 
 label {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #3a4556;
   line-height: 1.5;
@@ -278,6 +288,29 @@ label {
   color: #ffffff;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  .lucide-sparkles {
+    width: 32px;
+    height: 32px;
+  }
+
+  p {
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  #button1,
+  #button2,
+  #button3 {
+    max-width: 100%;
+    width: 100%;
+    font-size: 14px;
+  }
+}
 @media (max-width: 600px) {
   .buttons {
     display: grid;
@@ -286,5 +319,23 @@ label {
   .intesity-button {
     font-size: 14px;
     padding: 12px;
+  }
+
+  .tabs {
+    display: flex;
+    flex-direction: column;
+  }
+  .header-content {
+    gap: 0px;
+  }
+
+  #logo {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  #logo {
+    font-size: 28px;
   }
 }
