@@ -292,6 +292,10 @@ label {
   .container {
     padding: 16px;
   }
+
+  #entry-form {
+    padding: 24px;
+  }
   .lucide-sparkles {
     width: 32px;
     height: 32px;
