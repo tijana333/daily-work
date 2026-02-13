@@ -255,9 +255,14 @@ label {
   border: 2px solid #e8edf2;
   font-size: 16px;
   font-weight: 400;
-  color: #a0aab8;
+  color: #3a4556;
 }
 
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a0aab8;
+  opacity: 1;
+}
 .form-group input:hover,
 .form-group textarea:hover {
   border-color: #87c8ec;
