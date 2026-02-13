@@ -46,9 +46,13 @@ form.addEventListener("submit", function (event) {
 });
 
 let intesity = 0;
-const button = document.querySelectorAll(".intesity-button");
-button.forEach(function (button) {
+const buttons = document.querySelectorAll(".intesity-button");
+buttons.forEach(function (button) {
   button.addEventListener("click", function (element) {
+    buttons.forEach(function (btn) {
+      btn.classList.remove("active");
+    });
+    button.classList.add("active");
     const buttonValue = element.target.textContent;
     intesity = buttonValue;
     console.log(intesity);

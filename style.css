@@ -234,8 +234,15 @@ label {
   transform: translateY(-1.5px);
   box-shadow: 0 6px 14px rgba(200, 230, 255, 0.4);
 }
-.button-form:active .intensity-button:active {
+.button-form:active .intesity-button:active {
   transform: translateY(-1px);
+}
+
+.intesity-button.active {
+  border-color: #87c8ec;
+  background-color: #eef7ff;
+  box-shadow: 0 6px 14px rgba(200, 230, 255, 0.5);
+  transform: translateY(-1.5px);
 }
 .tab-number {
   font-size: 28px;
