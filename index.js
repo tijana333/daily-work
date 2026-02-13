@@ -49,7 +49,7 @@ let intesity = 0;
 const button = document.querySelectorAll(".intesity-button");
 button.forEach(function (button) {
   button.addEventListener("click", function (element) {
-    const buttonValue = Number(element.target.textContent);
+    const buttonValue = element.target.textContent;
     intesity = buttonValue;
     console.log(intesity);
   });
