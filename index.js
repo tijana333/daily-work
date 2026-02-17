@@ -21,6 +21,15 @@ form.addEventListener("submit", function (event) {
 
   const dateElement = document.getElementById("date");
   const dateValue = dateElement.value;
+  let dateError = document.getElementById("date-error");
+  dateError.textContent = "";
+  dateError.classList.remove("error");
+
+  if (dateValue.length == 0) {
+    dateError.textContent = "Select date!";
+    classList.add("error");
+  }
+  return;
   console.log(dateValue);
 
   const hoursElement = document.getElementById("number");
@@ -38,15 +47,15 @@ form.addEventListener("submit", function (event) {
   const entry = {
     date: dateValue,
     hours: hoursValue,
-    intesity: intesity,
+    intensity: intensity,
     challenge: challengeValue,
     note: noteValue,
   };
   console.log(entry);
 });
 
-let intesity = 0;
-const buttons = document.querySelectorAll(".intesity-button");
+let intensity = 0;
+const buttons = document.querySelectorAll(".intensity-button");
 buttons.forEach(function (button) {
   button.addEventListener("click", function (element) {
     buttons.forEach(function (btn) {
@@ -54,7 +63,7 @@ buttons.forEach(function (button) {
     });
     button.classList.add("active");
     const buttonValue = element.target.textContent;
-    intesity = buttonValue;
-    console.log(intesity);
+    intensity = buttonValue;
+    console.log(intensity);
   });
 });
