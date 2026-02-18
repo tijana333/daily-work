@@ -84,10 +84,47 @@ form.addEventListener("submit", function (event) {
 
   const challengeElement = document.getElementById("text");
   const challengeValue = challengeElement.value.trim();
+  let challengeError = document.getElementById("challenge-error");
+  if (challengeElement.value === "") {
+    challengeError.textContent = "Challenge is required";
+    challengeElement.classList.add("error");
+    formMessage.textContent = "Challenge is required!";
+    formMessage.classList.remove("hidden");
+    challengeElement.closest(".form-group").prepend(formMessage);
+    return;
+  }
+
+  if (challengeValue === "") {
+    challengeError.textContent = "Challenge is required";
+    challengeElement.classList.add("error");
+    formMessage.textContent = "Challenge is required!";
+    formMessage.classList.remove("hidden");
+    challengeElement.closest(".form-group").prepend(formMessage);
+    return;
+  }
+  if (challengeValue.length > 100) {
+    challengeError.textContent = "Maximum 100 characters";
+    challengeElement.classList.add("error");
+    formMessage.textContent = "Maximum 100 characters";
+    formMessage.classList.remove("hidden");
+    challengeElement.closest(".form-group").prepend(formMessage);
+    return;
+  }
+
   console.log(challengeValue);
 
   const noteElement = document.getElementById("note");
   const noteValue = noteElement.value.trim();
+  let noteError = document.getElementById("note-error");
+
+  if (noteValue !== "" && noteValue.length > 500) {
+    noteError.textContent = "Maximum 500 characters";
+    noteElement.classList.add("error");
+    formMessage.textContent = "Maximum 500 characters";
+    formMessage.classList.remove("hidden");
+    noteElement.closest(".form-group").prepend(formMessage);
+    return;
+  }
   console.log(noteValue);
 
   const entry = {
@@ -100,7 +137,7 @@ form.addEventListener("submit", function (event) {
   console.log(entry);
 });
 
-let intensity = 0;
+let intensity = 1;
 const buttons = document.querySelectorAll(".intensity-button");
 buttons.forEach(function (button) {
   button.addEventListener("click", function (element) {
@@ -109,7 +146,7 @@ buttons.forEach(function (button) {
     });
     button.classList.add("active");
     const buttonValue = element.target.textContent;
-    intensity = buttonValue;
+    intensity = Number(buttonValue);
     console.log(intensity);
   });
 });
