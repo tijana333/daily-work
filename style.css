@@ -316,10 +316,19 @@ textarea.error {
   font-size: 14px;
   color: red;
   min-height: 20px;
+  display: none;
+}
+
+.catch-error.show {
+  display: block;
 }
 
 .hidden {
   display: none;
+}
+
+.required {
+  color: red;
 }
 
 @media (max-width: 768px) {
