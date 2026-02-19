@@ -16,25 +16,43 @@ tabs.forEach(function (tab) {
 });
 
 const form = document.getElementById("entry-form");
+const dateElement = document.getElementById("date");
+const date = new Date();
+const todayDate = date.toISOString().substring(0, 10);
+dateElement.max = todayDate;
 form.addEventListener("submit", function (event) {
   event.preventDefault();
-
-  const dateElement = document.getElementById("date");
-  const dateValue = dateElement.value;
+  let hasErrors = false;
   let dateError = document.getElementById("date-error");
+
+  let hoursError = document.getElementById("hours-error");
+  const hoursElement = document.getElementById("number");
+  const hoursValue = Number(hoursElement.value);
+
+  let challengeError = document.getElementById("challenge-error");
+  const challengeElement = document.getElementById("text");
+  const challengeValue = challengeElement.value.trim();
+
+  let noteError = document.getElementById("note-error");
+  const noteElement = document.getElementById("note");
+  const noteValue = noteElement.value.trim();
+
   dateError.textContent = "";
   dateElement.classList.remove("error");
-  let formMessage = document.getElementById("form-message");
-  formMessage.textContent = "";
-  formMessage.classList.add("hidden");
+
+  hoursError.textContent = "";
+  hoursElement.classList.remove("error");
+
+  challengeError.textContent = "";
+  challengeElement.classList.remove("error");
+
+  noteError.textContent = "";
+  noteElement.classList.remove("error");
 
   if (dateValue.length == 0) {
     dateError.textContent = "Select date!";
     dateElement.classList.add("error");
-    formMessage.textContent = "Select date!";
-    formMessage.classList.remove("hidden");
-    dateElement.closest(".form-group").prepend(formMessage);
-    return;
+    hasErrors = true;
   }
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -43,90 +61,46 @@ form.addEventListener("submit", function (event) {
   if (selectedDate > today) {
     dateError.textContent = "Date cannot be in the future";
     dateElement.classList.add("error");
-    formMessage.textContent = "Date cannot be in the future";
-    formMessage.classList.remove("hidden");
-    dateElement.closest(".form-group").prepend(formMessage);
-
-    return;
+    hasErrors = true;
   }
-
-  const hoursElement = document.getElementById("number");
-  const hoursValue = Number(hoursElement.value);
-  let hoursError = document.getElementById("hours-error");
-  hoursError.textContent = "";
-  hoursElement.classList.remove("error");
 
   if (hoursElement.value === "") {
     hoursError.textContent = "Select hours!";
     hoursElement.classList.add("error");
-    formMessage.textContent = "Select hours!";
-    formMessage.classList.remove("hidden");
-    hoursElement.closest(".form-group").prepend(formMessage);
-    return;
+    hasErrors = true;
   }
   if (isNaN(hoursValue)) {
     hoursError.textContent = "Hours must be a number!";
     hoursElement.classList.add("error");
-    formMessage.textContent = "Hours must be a number!";
-    formMessage.classList.remove("hidden");
-    hoursElement.closest(".form-group").prepend(formMessage);
-    return;
+
+    hasErrors = true;
   }
 
   if (hoursValue < 0 || hoursValue > 24) {
     hoursError.textContent = "Hours must be between 0 and 24";
     hoursElement.classList.add("error");
-    formMessage.textContent = "Hours must be between 0 and 24";
-    formMessage.classList.remove("hidden");
-    hoursElement.closest(".form-group").prepend(formMessage);
-    return;
-  }
-
-  const challengeElement = document.getElementById("text");
-  const challengeValue = challengeElement.value.trim();
-  let challengeError = document.getElementById("challenge-error");
-  if (challengeElement.value === "") {
-    challengeError.textContent = "Challenge is required";
-    challengeElement.classList.add("error");
-    formMessage.textContent = "Challenge is required!";
-    formMessage.classList.remove("hidden");
-    challengeElement.closest(".form-group").prepend(formMessage);
-    return;
+    hasErrors = true;
   }
 
   if (challengeValue === "") {
     challengeError.textContent = "Challenge is required";
     challengeElement.classList.add("error");
-    formMessage.textContent = "Challenge is required!";
-    formMessage.classList.remove("hidden");
-    challengeElement.closest(".form-group").prepend(formMessage);
-    return;
+    hasErrors = true;
   }
   if (challengeValue.length > 100) {
     challengeError.textContent = "Maximum 100 characters";
     challengeElement.classList.add("error");
-    formMessage.textContent = "Maximum 100 characters";
-    formMessage.classList.remove("hidden");
-    challengeElement.closest(".form-group").prepend(formMessage);
-    return;
+    hasErrors = true;
   }
-
-  console.log(challengeValue);
-
-  const noteElement = document.getElementById("note");
-  const noteValue = noteElement.value.trim();
-  let noteError = document.getElementById("note-error");
 
   if (noteValue !== "" && noteValue.length > 500) {
     noteError.textContent = "Maximum 500 characters";
     noteElement.classList.add("error");
-    formMessage.textContent = "Maximum 500 characters";
-    formMessage.classList.remove("hidden");
-    noteElement.closest(".form-group").prepend(formMessage);
+    hasErrors = true;
+  }
+  if (hasErrors) {
     return;
   }
-  console.log(noteValue);
-
   const entry = {
     date: dateValue,
     hours: hoursValue,
@@ -139,6 +113,14 @@ form.addEventListener("submit", function (event) {
 
 let intensity = 1;
 const buttons = document.querySelectorAll(".intensity-button");
+buttons.forEach(function (button) {
+  const numberSpan = button.querySelector(".tab-number");
+  const spanValue = numberSpan.textContent;
+  if (spanValue === "1") {
+    button.classList.add("active");
+  }
+});
+
 buttons.forEach(function (button) {
   button.addEventListener("click", function (element) {
     buttons.forEach(function (btn) {
