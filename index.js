@@ -24,7 +24,7 @@ form.addEventListener("submit", function (event) {
   event.preventDefault();
   let hasErrors = false;
   let dateError = document.getElementById("date-error");
-
+  const dateValue = dateElement.value;
   let hoursError = document.getElementById("hours-error");
   const hoursElement = document.getElementById("number");
   const hoursValue = Number(hoursElement.value);
@@ -54,11 +54,8 @@ form.addEventListener("submit", function (event) {
     dateElement.classList.add("error");
     hasErrors = true;
   }
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const selectedDate = new Date(dateValue);
 
-  if (selectedDate > today) {
+  if (dateValue > todayDate) {
     dateError.textContent = "Date cannot be in the future";
     dateElement.classList.add("error");
     hasErrors = true;
