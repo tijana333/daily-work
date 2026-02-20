@@ -322,11 +322,6 @@ textarea.error {
 .catch-error.show {
   display: block;
 }
-
-.hidden {
-  display: none;
-}
-
 .required {
   color: red;
 }

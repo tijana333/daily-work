@@ -20,6 +20,25 @@ const dateElement = document.getElementById("date");
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 dateElement.max = todayDate;
+
+let dateError = document.getElementById("date-error");
+const dateValue = dateElement.value;
+
+dateElement.addEventListener("change", function () {
+  dateError.textContent = "";
+  dateError.classList.remove("show");
+  dateElement.classList.remove("error");
+
+  if (dateValue.length == 0) {
+    dateError.textContent = "Select date!";
+    dateError.classList.add("show");
+    dateElement.classList.add("error");
+  } else if (dateValue > todayDate) {
+    dateError.textContent = "Date cannot be in the future";
+    dateError.classList.add("show");
+    dateElement.classList.add("error");
+  }
+});
 const hoursElement = document.getElementById("number");
 let hoursError = document.getElementById("hours-error");
 const hoursValue = Number(hoursElement.value);
@@ -27,16 +46,20 @@ const hoursValue = Number(hoursElement.value);
 hoursElement.addEventListener("input", function () {
   const hoursValue = Number(hoursElement.value);
   hoursError.textContent = "";
+  hoursError.classList.remove("show");
   hoursElement.classList.remove("error");
 
   if (hoursElement.value === "") {
     hoursError.textContent = "Select hours!";
+    hoursError.classList.add("show");
     hoursElement.classList.add("error");
   } else if (isNaN(hoursValue)) {
     hoursError.textContent = "Hours must be a number!";
+    hoursError.classList.add("show");
     hoursElement.classList.add("error");
   } else if (hoursValue < 0 || hoursValue > 24) {
     hoursError.textContent = "Hours must be between 0 and 24";
+    hoursError.classList.add("show");
     hoursElement.classList.add("error");
   }
 });
@@ -47,13 +70,16 @@ const challengeElement = document.getElementById("text");
 challengeElement.addEventListener("input", function () {
   const challengeValue = challengeElement.value.trim();
   challengeError.textContent = "";
+  challengeError.classList.remove("show");
   challengeElement.classList.remove("error");
 
   if (challengeValue === "") {
     challengeError.textContent = "Challenge is required";
+    challengeError.classList.add("show");
     challengeElement.classList.add("error");
   } else if (challengeValue.length > 100) {
     challengeError.textContent = "Maximum 100 characters";
+    challengeError.classList.add("show");
     challengeElement.classList.add("error");
   }
 });
@@ -62,35 +88,73 @@ form.addEventListener("submit", function (event) {
   event.preventDefault();
   let hasErrors = false;
   const hoursValue = Number(hoursElement.value);
+
+  hoursError.textContent = "";
+  hoursError.classList.remove("show");
+  hoursElement.classList.remove("error");
+
+  if (hoursElement.value === "") {
+    hoursError.textContent = "Select hours!";
+    hoursError.classList.add("show");
+    hoursElement.classList.add("error");
+    hasErrors = true;
+  } else if (isNaN(hoursValue)) {
+    hoursError.textContent = "Hours must be a number!";
+    hoursError.classList.add("show");
+    hoursElement.classList.add("error");
+    hasErrors = true;
+  } else if (hoursValue < 0 || hoursValue > 24) {
+    hoursError.textContent = "Hours must be between 0 and 24";
+    hoursError.classList.add("show");
+    hoursElement.classList.add("error");
+    hasErrors = true;
+  }
+
   const challengeValue = challengeElement.value.trim();
 
-  let dateError = document.getElementById("date-error");
-  const dateValue = dateElement.value;
+  challengeError.textContent = "";
+  challengeError.classList.remove("show");
+  challengeElement.classList.remove("error");
 
+  if (challengeValue === "") {
+    challengeError.textContent = "Challenge is required";
+    challengeError.classList.add("show");
+    challengeElement.classList.add("error");
+    hasErrors = true;
+  } else if (challengeValue.length > 100) {
+    challengeError.textContent = "Maximum 100 characters";
+    challengeError.classList.add("show");
+    challengeElement.classList.add("error");
+    hasErrors = true;
+  }
+
+  const dateValue = dateElement.value;
+  dateError.textContent = "";
+  dateError.classList.remove("show");
+  dateElement.classList.remove("error");
+
+  if (dateValue.length == 0) {
+    dateError.textContent = "Select date!";
+    dateError.classList.add("show");
+    dateElement.classList.add("error");
+    hasErrors = true;
+  } else if (dateValue > todayDate) {
+    dateError.textContent = "Date cannot be in the future";
+    dateError.classList.add("show");
+    dateElement.classList.add("error");
+    hasErrors = true;
+  }
   let noteError = document.getElementById("note-error");
   const noteElement = document.getElementById("note");
   const noteValue = noteElement.value.trim();
 
-  dateError.textContent = "";
-  dateElement.classList.remove("error");
-
   noteError.textContent = "";
+  noteError.classList.remove("show");
   noteElement.classList.remove("error");
-
-  if (dateValue.length == 0) {
-    dateError.textContent = "Select date!";
-    dateElement.classList.add("error");
-    hasErrors = true;
-  }
-
-  if (dateValue > todayDate) {
-    dateError.textContent = "Date cannot be in the future";
-    dateElement.classList.add("error");
-    hasErrors = true;
-  }
 
   if (noteValue !== "" && noteValue.length > 500) {
     noteError.textContent = "Maximum 500 characters";
+    noteError.classList.add("show");
     noteElement.classList.add("error");
     hasErrors = true;
   }
