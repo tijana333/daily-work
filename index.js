@@ -10,16 +10,36 @@ tabs.forEach(function (tab) {
 
     const name = tab.dataset.tab;
     const id = name + "-section";
+    if (name === "entries") {
+      loadEntries();
+    }
 
     document.getElementById(id).classList.add("active");
+    console.log("Activated section:", id);
   });
 });
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
+const successMsg = document.getElementById("success-message");
+const serverError = document.getElementById("server-error");
+const entriesList = document.getElementById("entries-list");
+const submitBtn = form.querySelector('button[type="submit"]');
+const submitBtnText = submitBtn.querySelector("span");
+const originalSubmitButtonText = submitBtnText.textContent;
+function setLoading(isLoading) {
+  if (isLoading === true) {
+    submitBtnText.textContent = "Saving...";
+    submitBtn.disabled = true;
+  } else {
+    submitBtnText.textContent = originalSubmitButtonText;
+    submitBtn.disabled = false;
+  }
+}
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 dateElement.max = todayDate;
+console.log(submitBtn);
 
 let dateError = document.getElementById("date-error");
 dateElement.addEventListener("change", function () {
@@ -84,36 +104,70 @@ challengeElement.addEventListener("input", function () {
 });
 
 async function submitEntry(entry) {
-  console.log("saljem entry:", entry);
+  setLoading(true);
+  try {
+    console.log("saljem entry:", entry);
+    const response = await fetch(
+      "https://daily-work-backend.vercel.app/api/entries",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      },
+    );
+    const text = await response.text();
+    if (response.status === 409) {
+      serverError.textContent = "Entry for this date already exists";
+      serverError.style.display = "block";
+      successMsg.style.display = "none";
+      return;
+    }
+    if (response.status === 201) {
+      form.reset();
+      intensity = 1;
+      successMsg.style.display = "block";
+      serverError.style.display = "none";
+      const buttons = document.querySelectorAll(".intensity-button");
+      buttons.forEach(function (button) {
+        const numberSpan = button.querySelector(".tab-number");
+        const spanValue = numberSpan.textContent;
+        button.classList.remove("active");
+        if (spanValue === "1") {
+          button.classList.add("active");
+        }
+      });
+    } else {
+      serverError.textContent = "Something went wrong!";
+      serverError.style.display = "block";
+      successMsg.style.display = "none";
+    }
+    console.log("status", response.status);
+    console.log("response body:", text);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function loadEntries() {
+  entriesList.textContent = "Loading...";
   const response = await fetch(
     "https://daily-work-backend.vercel.app/api/entries",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    },
   );
-  const text = await response.text();
-  if (response.status === 409) {
-    alert("Entry for this date already exists");
-    return;
-  }
-  if (response.status === 201) {
-    form.reset();
-    intensity = 1;
-    const buttons = document.querySelectorAll(".intensity-button");
-    buttons.forEach(function (button) {
-      const numberSpan = button.querySelector(".tab-number");
-      const spanValue = numberSpan.textContent;
-      button.classList.remove("active");
-      if (spanValue === "1") {
-        button.classList.add("active");
-      }
-    });
-  }
-
-  console.log("status", response.status);
-  console.log("response body:", text);
+  const data = await response.json();
+  const entries = data.data;
+  entriesList.innerHTML = entries
+    .map(
+      (entry) => `<div class="entries">
+    data: ${entry.date}, hours: ${entry.hours}, intensity: ${entry.intensity}, challenge: ${entry.challenge}, note: ${entry.note}
+  </div>`,
+    )
+    .join("");
+  console.log(entries);
+  console.log("entriesList id:", entriesList && entriesList.id);
+  console.log(
+    "entriesList parent:",
+    entriesList && entriesList.parentElement && entriesList.parentElement.id,
+  );
 }
 
 form.addEventListener("submit", function (event) {
