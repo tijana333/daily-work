@@ -1,3 +1,4 @@
+const API_URL = "https://daily-work-backend.vercel.app/api/entries";
 const tabs = document.querySelectorAll(".tab");
 tabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -15,7 +16,6 @@ tabs.forEach(function (tab) {
     }
 
     document.getElementById(id).classList.add("active");
-    console.log("Activated section:", id);
   });
 });
 
@@ -39,11 +39,9 @@ function setLoading(isLoading) {
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 dateElement.max = todayDate;
-console.log(submitBtn);
-
 let dateError = document.getElementById("date-error");
-dateElement.addEventListener("change", function () {
-  dateError.textContent = "";
+
+function validateDate() {
   const dateValue = dateElement.value;
   dateError.classList.remove("show");
   dateElement.classList.remove("error");
@@ -52,17 +50,22 @@ dateElement.addEventListener("change", function () {
     dateError.textContent = "Select date!";
     dateError.classList.add("show");
     dateElement.classList.add("error");
+    return false;
   } else if (dateValue > todayDate) {
     dateError.textContent = "Date cannot be in the future";
     dateError.classList.add("show");
     dateElement.classList.add("error");
+    return false;
   }
+  return true;
+}
+dateElement.addEventListener("change", function () {
+  validateDate();
 });
 const hoursElement = document.getElementById("number");
 let hoursError = document.getElementById("hours-error");
-const hoursValue = Number(hoursElement.value);
 
-hoursElement.addEventListener("input", function () {
+function validateHours() {
   const hoursValue = Number(hoursElement.value);
   hoursError.textContent = "";
   hoursError.classList.remove("show");
@@ -72,21 +75,28 @@ hoursElement.addEventListener("input", function () {
     hoursError.textContent = "Select hours!";
     hoursError.classList.add("show");
     hoursElement.classList.add("error");
+    return false;
   } else if (isNaN(hoursValue)) {
     hoursError.textContent = "Hours must be a number!";
     hoursError.classList.add("show");
     hoursElement.classList.add("error");
+    return false;
   } else if (hoursValue < 0 || hoursValue > 24) {
     hoursError.textContent = "Hours must be between 0 and 24";
     hoursError.classList.add("show");
     hoursElement.classList.add("error");
+    return false;
   }
+  return true;
+}
+hoursElement.addEventListener("input", function () {
+  validateHours();
 });
 
 let challengeError = document.getElementById("challenge-error");
 const challengeElement = document.getElementById("text");
 
-challengeElement.addEventListener("input", function () {
+function validateChallenge() {
   const challengeValue = challengeElement.value.trim();
   challengeError.textContent = "";
   challengeError.classList.remove("show");
@@ -96,25 +106,27 @@ challengeElement.addEventListener("input", function () {
     challengeError.textContent = "Challenge is required";
     challengeError.classList.add("show");
     challengeElement.classList.add("error");
+    return false;
   } else if (challengeValue.length > 100) {
     challengeError.textContent = "Maximum 100 characters";
     challengeError.classList.add("show");
     challengeElement.classList.add("error");
+    return false;
   }
+  return true;
+}
+challengeElement.addEventListener("input", function () {
+  validateChallenge();
 });
 
 async function submitEntry(entry) {
   setLoading(true);
   try {
-    console.log("saljem entry:", entry);
-    const response = await fetch(
-      "https://daily-work-backend.vercel.app/api/entries",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(entry),
-      },
-    );
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
     const text = await response.text();
     if (response.status === 409) {
       serverError.textContent = "Entry for this date already exists";
@@ -141,8 +153,6 @@ async function submitEntry(entry) {
       serverError.style.display = "block";
       successMsg.style.display = "none";
     }
-    console.log("status", response.status);
-    console.log("response body:", text);
   } finally {
     setLoading(false);
   }
@@ -150,84 +160,36 @@ async function submitEntry(entry) {
 
 async function loadEntries() {
   entriesList.textContent = "Loading...";
-  const response = await fetch(
-    "https://daily-work-backend.vercel.app/api/entries",
-  );
-  const data = await response.json();
-  const entries = data.data;
-  entriesList.innerHTML = entries
-    .map(
-      (entry) => `<div class="entries">
+  try {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    const entries = data.data;
+    entriesList.innerHTML = entries
+      .map(
+        (entry) => `<div class="entries">
     data: ${entry.date}, hours: ${entry.hours}, intensity: ${entry.intensity}, challenge: ${entry.challenge}, note: ${entry.note}
   </div>`,
-    )
-    .join("");
-  console.log(entries);
-  console.log("entriesList id:", entriesList && entriesList.id);
-  console.log(
-    "entriesList parent:",
-    entriesList && entriesList.parentElement && entriesList.parentElement.id,
-  );
+      )
+      .join("");
+  } catch (error) {
+    entriesList.textContent = "Something went wrong!";
+  }
 }
 
 form.addEventListener("submit", function (event) {
   event.preventDefault();
   let hasErrors = false;
-  const hoursValue = Number(hoursElement.value);
 
-  hoursError.textContent = "";
-  hoursError.classList.remove("show");
-  hoursElement.classList.remove("error");
-
-  if (hoursElement.value === "") {
-    hoursError.textContent = "Select hours!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    hasErrors = true;
-  } else if (isNaN(hoursValue)) {
-    hoursError.textContent = "Hours must be a number!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    hasErrors = true;
-  } else if (hoursValue < 0 || hoursValue > 24) {
-    hoursError.textContent = "Hours must be between 0 and 24";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
+  const isValidHours = validateHours();
+  if (!isValidHours) {
     hasErrors = true;
   }
-
-  const challengeValue = challengeElement.value.trim();
-
-  challengeError.textContent = "";
-  challengeError.classList.remove("show");
-  challengeElement.classList.remove("error");
-
-  if (challengeValue === "") {
-    challengeError.textContent = "Challenge is required";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
-    hasErrors = true;
-  } else if (challengeValue.length > 100) {
-    challengeError.textContent = "Maximum 100 characters";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
+  const isValidChallenge = validateChallenge();
+  if (!isValidChallenge) {
     hasErrors = true;
   }
-
-  const dateValue = dateElement.value;
-  dateError.textContent = "";
-  dateError.classList.remove("show");
-  dateElement.classList.remove("error");
-
-  if (dateValue.length == 0) {
-    dateError.textContent = "Select date!";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
-    hasErrors = true;
-  } else if (dateValue > todayDate) {
-    dateError.textContent = "Date cannot be in the future";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
+  const isValidDate = validateDate();
+  if (!isValidDate) {
     hasErrors = true;
   }
   let noteError = document.getElementById("note-error");
@@ -248,10 +210,10 @@ form.addEventListener("submit", function (event) {
     return;
   }
   const entry = {
-    date: dateValue,
-    hours: hoursValue,
+    date: dateElement.value,
+    hours: Number(hoursElement.value),
     intensity: intensity,
-    challenge: challengeValue,
+    challenge: challengeElement.value.trim(),
     note: noteValue,
   };
   submitEntry(entry);
@@ -276,6 +238,5 @@ buttons.forEach(function (button) {
     const numberSpan = button.querySelector(".tab-number");
     const buttonValue = numberSpan.textContent;
     intensity = Number(buttonValue);
-    console.log(intensity);
   });
 });
