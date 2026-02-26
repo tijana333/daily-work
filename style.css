@@ -228,14 +228,13 @@ label {
   transition:
     transform 0.18s ease,
     border-color 0.18s ease;
-  box-shadow: 0.18s ease;
 }
 .intensity-button:hover {
   border-color: #87c8ec;
   transform: translateY(-1.5px);
   box-shadow: 0 6px 14px rgba(200, 230, 255, 0.4);
 }
-.button-form:active .intensity-button:active {
+.intensity-button:active {
   transform: translateY(-1px);
 }
 
@@ -329,12 +328,6 @@ textarea.error {
 #success-message {
   display: none;
   color: green;
-  margin: 0 auto 10px auto;
-  text-align: center;
-}
-#server-error {
-  display: block;
-  color: red;
   margin: 0 auto 10px auto;
   text-align: center;
 }
