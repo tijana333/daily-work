@@ -59,8 +59,26 @@ function validateDate() {
   }
   return true;
 }
+
+async function loadEntryByDate(selectedDate) {
+  console.log("Selected date:", selectedDate);
+  const response = await fetch(API_URL + "?date=" + selectedDate);
+  console.log(response);
+
+  if (response.status === 404) {
+    console.log("no entry");
+    return;
+  }
+  const data = await response.json();
+  const entry = data.data;
+  console.log(entry);
+}
+
 dateElement.addEventListener("change", function () {
-  validateDate();
+  const isValid = validateDate();
+  if (isValid === true) {
+    loadEntryByDate(dateElement.value);
+  }
 });
 const hoursElement = document.getElementById("number");
 let hoursError = document.getElementById("hours-error");
