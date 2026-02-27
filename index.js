@@ -59,6 +59,7 @@ function validateDate() {
   }
   return true;
 }
+const noteElement = document.getElementById("note");
 
 async function loadEntryByDate(selectedDate) {
   console.log("Selected date:", selectedDate);
@@ -70,8 +71,22 @@ async function loadEntryByDate(selectedDate) {
     return;
   }
   const data = await response.json();
-  const entry = data.data;
-  console.log(entry);
+  if (!data.data[0]) {
+    return;
+  }
+  const entry = data.data[0];
+  console.log("ENTRY:", entry);
+  hoursElement.value = entry.hours || "";
+  challengeElement.value = entry.challenge;
+  noteElement.value = entry.note || "";
+
+  buttons.forEach(function (button) {
+    button.classList.remove("active");
+    const numberSpan = button.querySelector(".tab-number");
+    if (numberSpan.textContent == entry.intensity) {
+      button.classList.add("active");
+    }
+  });
 }
 
 dateElement.addEventListener("change", function () {
@@ -211,7 +226,6 @@ form.addEventListener("submit", function (event) {
     hasErrors = true;
   }
   let noteError = document.getElementById("note-error");
-  const noteElement = document.getElementById("note");
   const noteValue = noteElement.value.trim();
 
   noteError.textContent = "";
