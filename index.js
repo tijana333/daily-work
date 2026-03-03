@@ -26,6 +26,7 @@ const serverError = document.getElementById("server-error");
 const entriesList = document.getElementById("entries-list");
 const submitBtn = form.querySelector('button[type="submit"]');
 const submitBtnText = submitBtn.querySelector("span");
+let editingEntryId = null;
 const originalSubmitButtonText = submitBtnText.textContent;
 function setLoading(isLoading) {
   if (isLoading === true) {
@@ -67,14 +68,22 @@ async function loadEntryByDate(selectedDate) {
   console.log(response);
 
   if (response.status === 404) {
-    console.log("no entry");
+    editingEntryId = null;
+    submitBtnText.textContent = "Save Entry";
     return;
   }
   const data = await response.json();
   if (!data.data[0]) {
+    editingEntryId = null;
+    submitBtnText.textContent = "Save Entry";
     return;
   }
   const entry = data.data[0];
+  if (data.data[0]) {
+    editingEntryId = entry._id;
+    console.log("SET ID:", editingEntryId);
+    submitBtnText.textContent = "Update Entry";
+  }
   console.log("ENTRY:", entry);
   hoursElement.value = entry.hours || "";
   challengeElement.value = entry.challenge;
@@ -152,6 +161,32 @@ challengeElement.addEventListener("input", function () {
   validateChallenge();
 });
 
+async function updateEntry(id, entry) {
+  setLoading(true);
+  try {
+    const response = await fetch(API_URL + "/" + id, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+
+    if (response.status === 200) {
+      successMsg.textContent = "Entry updated successfully!";
+      successMsg.style.display = "block";
+      serverError.style.display = "none";
+    } else {
+      serverError.textContent = "Update failed!";
+      serverError.style.display = "block";
+      successMsg.style.display = "none";
+    }
+  } catch (error) {
+    serverError.textContent = "Update failed!";
+    serverError.style.display = "block";
+    successMsg.style.display = "none";
+  } finally {
+    setLoading(false);
+  }
+}
 async function submitEntry(entry) {
   setLoading(true);
   try {
@@ -248,7 +283,11 @@ form.addEventListener("submit", function (event) {
     challenge: challengeElement.value.trim(),
     note: noteValue,
   };
-  submitEntry(entry);
+  if (editingEntryId) {
+    updateEntry(editingEntryId, entry);
+  } else {
+    submitEntry(entry);
+  }
 });
 
 let intensity = 1;
