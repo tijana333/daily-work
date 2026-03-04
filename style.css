@@ -324,11 +324,16 @@ textarea.error {
 .required {
   color: red;
 }
-
+#server-error {
+  display: none;
+  color: red;
+  margin: 16px auto 0 auto;
+  text-align: center;
+}
 #success-message {
   display: none;
   color: green;
-  margin: 0 auto 10px auto;
+  margin: 16px auto 0 auto;
   text-align: center;
 }
 .entries {
