@@ -18,6 +18,8 @@ tabs.forEach(function (tab) {
     document.getElementById(id).classList.add("active");
   });
 });
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("date").value = today;
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
@@ -195,7 +197,6 @@ async function submitEntry(entry) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(entry),
     });
-    const text = await response.text();
     if (response.status === 409) {
       serverError.textContent = "Entry for this date already exists";
       serverError.style.display = "block";
