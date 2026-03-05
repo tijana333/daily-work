@@ -139,7 +139,6 @@
                 </svg>
                 <label for="date"> Date <span class="required">*</span></label>
               </div>
-              <input type="date" id="date" />
               <span id="date-error" class="catch-error"></span>
             </div>
 
@@ -307,6 +306,11 @@
         <div class="row">
           <h2>Monthly Overview</h2>
           <p id="paragraph-section">Your work pattern at a glance</p>
+          <div class="carousel">
+            <button id="prev-month">←</button>
+            <span id="current-month"></span>
+            <button id="next-month">→</button>
+          </div>
         </div>
       </div>
       <div id="entries-section" class="tab-content">

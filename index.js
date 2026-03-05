@@ -312,3 +312,20 @@ buttons.forEach(function (button) {
     intensity = Number(buttonValue);
   });
 });
+
+/* ===== MONTH CAROUSEL ===== */
+
+const currentMonthElement = document.getElementById("current-month");
+const previousMonthElement = document.getElementById("prev-month");
+const nextMonthElement = document.getElementById("next-month");
+let activeMonth = new Date();
+
+function renderMonth() {
+  let monthText = activeMonth.toLocaleString(undefined, {
+    year: "numeric",
+    month: "long",
+  });
+  currentMonthElement.textContent = monthText;
+}
+
+renderMonth();
