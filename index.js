@@ -316,9 +316,14 @@ buttons.forEach(function (button) {
 /* ===== MONTH CAROUSEL ===== */
 
 const currentMonthElement = document.getElementById("current-month");
-const previousMonthElement = document.getElementById("prev-month");
-const nextMonthElement = document.getElementById("next-month");
+const previousMonthButton = document.getElementById("prev-month");
+const nextMonthButton = document.getElementById("next-month");
+const monthCarousel = document.getElementById("month-carousel");
 let activeMonth = new Date();
+let startX = 0;
+let startY = 0;
+let endX = 0;
+let endY = 0;
 
 function renderMonth() {
   let monthText = activeMonth.toLocaleString(undefined, {
@@ -328,4 +333,32 @@ function renderMonth() {
   currentMonthElement.textContent = monthText;
 }
 
+previousMonthButton.addEventListener("click", function () {
+  activeMonth.setMonth(activeMonth.getMonth() - 1);
+  renderMonth();
+});
+
+nextMonthButton.addEventListener("click", function () {
+  activeMonth.setMonth(activeMonth.getMonth() + 1);
+  renderMonth();
+});
+monthCarousel.addEventListener("touchstart", function (event) {
+  startX = event.touches[0].clientX;
+  startY = event.touches[0].clientY;
+});
+
+monthCarousel.addEventListener("touchend", function (event) {
+  endX = event.changedTouches[0].clientX;
+  endY = event.changedTouches[0].clientY;
+  let deltaX = endX - startX;
+  if (Math.abs(deltaX) < 50) return;
+  if (deltaX < 0) {
+    activeMonth.setMonth(activeMonth.getMonth() + 1);
+    renderMonth();
+  }
+  if (deltaX > 0) {
+    activeMonth.setMonth(activeMonth.getMonth() - 1);
+    renderMonth();
+  }
+});
 renderMonth();
