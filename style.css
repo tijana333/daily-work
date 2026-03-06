@@ -350,6 +350,7 @@ textarea.error {
   flex-direction: row;
   align-self: center;
   justify-content: center;
+  gap: 16px;
 
   margin-top: 32px;
   padding: 10px 12px;
