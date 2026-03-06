@@ -138,8 +138,8 @@
                   <path d="M3 10h18"></path>
                 </svg>
                 <label for="date"> Date <span class="required">*</span></label>
-                <input type="date" id="date" name="date" />
               </div>
+              <input type="date" id="date" name="date" />
               <span id="date-error" class="catch-error"></span>
             </div>
 
@@ -308,9 +308,15 @@
           <h2>Monthly Overview</h2>
           <p id="paragraph-section">Your work pattern at a glance</p>
           <div class="carousel" id="month-carousel">
-            <button id="prev-month">←</button>
+            <button id="prev-month">
+              <i data-lucide="chevron-left"></i>
+            </button>
+
             <span id="current-month"></span>
-            <button id="next-month">→</button>
+
+            <button id="next-month">
+              <i data-lucide="chevron-right"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -321,5 +327,8 @@
     </div>
     <!-- JavaScript -->
     <script src="index.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

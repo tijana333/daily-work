@@ -349,9 +349,12 @@ textarea.error {
   display: flex;
   flex-direction: row;
   align-self: center;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 48px;
+  justify-content: center;
+
+  margin-top: 32px;
   padding: 10px 12px;
+  width: 100%;
 
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
@@ -359,23 +362,30 @@ textarea.error {
 }
 
 .carousel button {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: white;
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid #d8dde6;
+  border-radius: 12px;
+  background: #ffffff;
+
+  font-size: 22px;
+  color: #5b6575;
 
   cursor: pointer;
-  user-select: none;
-
-  font-size: 18px;
-  line-height: 1;
+  transition: 0.2s ease;
 }
-
+.carousel button svg {
+  width: 20px;
+  height: 20px;
+  color: #7b8794;
+}
 .carousel button:hover {
-  transform: translateY(-1px);
+  background-color: #f7f9fc;
 }
 .carousel button:active {
   transform: translateY(0px);
@@ -387,14 +397,11 @@ textarea.error {
 }
 
 #current-month {
-  flex: 1;
-  align-items: center;
-
-  font-weight: 600;
-  letter-spacing: 0.2px;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 32px;
+  font-weight: 700;
+  color: #2f3a4c;
+  min-width: 220px;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
