@@ -349,7 +349,6 @@ textarea.error {
   display: flex;
   flex-direction: row;
   align-self: center;
-  gap: 48px;
   justify-content: center;
 
   margin-top: 32px;
@@ -367,7 +366,7 @@ textarea.error {
   justify-content: center;
 
   width: 44px;
-  height: 44px;
+  height: auto;
 
   border: 1px solid #d8dde6;
   border-radius: 12px;

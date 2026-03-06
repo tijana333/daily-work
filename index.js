@@ -321,12 +321,10 @@ const nextMonthButton = document.getElementById("next-month");
 const monthCarousel = document.getElementById("month-carousel");
 let activeMonth = new Date();
 let startX = 0;
-let startY = 0;
 let endX = 0;
-let endY = 0;
 
 function renderMonth() {
-  let monthText = activeMonth.toLocaleString(undefined, {
+  const monthText = activeMonth.toLocaleString(undefined, {
     year: "numeric",
     month: "long",
   });
@@ -351,7 +349,8 @@ monthCarousel.addEventListener("touchend", function (event) {
   endX = event.changedTouches[0].clientX;
   endY = event.changedTouches[0].clientY;
   let deltaX = endX - startX;
-  if (Math.abs(deltaX) < 50) return;
+  const swipe_threshold = 50;
+  if (Math.abs(deltaX) < swipe_threshold) return;
   if (deltaX < 0) {
     activeMonth.setMonth(activeMonth.getMonth() + 1);
     renderMonth();
