@@ -322,6 +322,20 @@ const monthCarousel = document.getElementById("month-carousel");
 let activeMonth = new Date();
 let startX = 0;
 let endX = 0;
+const grid = document.querySelector(".heatmap-grid");
+const emptyState = document.querySelector(".heatmap-empty-state");
+function renderHeatmap() {
+  grid.innerHTML = "";
+  const month = activeMonth.getMonth();
+  const year = activeMonth.getFullYear();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  emptyState.style.display = "none";
+  for (let i = 1; i <= daysInMonth; i++) {
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("heatmap-day");
+    grid.appendChild(newDiv);
+  }
+}
 
 function renderMonth() {
   const monthText = activeMonth.toLocaleString(undefined, {
@@ -361,3 +375,4 @@ monthCarousel.addEventListener("touchend", function (event) {
   }
 });
 renderMonth();
+renderHeatmap();

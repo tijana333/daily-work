@@ -501,6 +501,19 @@ textarea.error {
   background-color: #2f80c9;
 }
 
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 16px);
+  gap: 6px;
+}
+
+.heatmap-day {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background-color: #f1f5f9;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 16px;
