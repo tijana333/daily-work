@@ -337,6 +337,33 @@ function renderHeatmap() {
   }
 }
 
+async function loadHeatmapData() {
+  const month = activeMonth.getMonth();
+  const year = activeMonth.getFullYear();
+  const response = await fetch(
+    API_URL + "?month=" + (month + 1) + "&year=" + year,
+  );
+  const data = await response.json();
+  const entries = data.data;
+
+  if (entries.length > 0) {
+    grid.style.display = "grid";
+    emptyState.style.display = "none";
+    entries.forEach(function (entry) {
+      const day = new Date(entry.date).getDate();
+      const daySquare = grid.children[day - 1];
+      if (entry.intensity === 1) daySquare.classList.add("first-level");
+      if (entry.intensity === 2) daySquare.classList.add("second-level");
+      if (entry.intensity === 3) daySquare.classList.add("third-level");
+      if (entry.intensity === 4) daySquare.classList.add("four-level");
+      if (entry.intensity === 5) daySquare.classList.add("five-level");
+    });
+  } else {
+    emptyState.style.display = "block";
+    grid.style.display = "none";
+  }
+}
+
 function renderMonth() {
   const monthText = activeMonth.toLocaleString(undefined, {
     year: "numeric",
@@ -348,11 +375,13 @@ function renderMonth() {
 previousMonthButton.addEventListener("click", function () {
   activeMonth.setMonth(activeMonth.getMonth() - 1);
   renderMonth();
+  loadHeatmapData();
 });
 
 nextMonthButton.addEventListener("click", function () {
   activeMonth.setMonth(activeMonth.getMonth() + 1);
   renderMonth();
+  loadHeatmapData();
 });
 monthCarousel.addEventListener("touchstart", function (event) {
   startX = event.touches[0].clientX;
@@ -376,3 +405,4 @@ monthCarousel.addEventListener("touchend", function (event) {
 });
 renderMonth();
 renderHeatmap();
+loadHeatmapData();
