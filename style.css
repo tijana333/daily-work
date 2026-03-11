@@ -503,8 +503,8 @@ textarea.error {
 
 .heatmap-grid {
   display: grid;
-  grid-template-columns: repeat(7, 16px);
-  gap: 6px;
+  grid-template-columns: repeat(7, 18px);
+  gap: 8px;
 }
 
 .heatmap-day {
@@ -512,6 +512,22 @@ textarea.error {
   height: 16px;
   border-radius: 2px;
   background-color: #f1f5f9;
+}
+
+.level-1 {
+  background-color: #e8eef7;
+}
+.level-2 {
+  background-color: #d6e6f5;
+}
+.level-3 {
+  background-color: #b7d3ee;
+}
+.level-4 {
+  background-color: #7fb3e6;
+}
+.level-5 {
+  background-color: #2f80c9;
 }
 
 @media (max-width: 768px) {

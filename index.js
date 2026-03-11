@@ -345,6 +345,8 @@ async function loadHeatmapData() {
   );
   const data = await response.json();
   const entries = data.data;
+  console.log("month/year", month + 1, year);
+  console.log("entries", entries);
 
   if (entries.length > 0) {
     grid.style.display = "grid";
@@ -352,11 +354,12 @@ async function loadHeatmapData() {
     entries.forEach(function (entry) {
       const day = new Date(entry.date).getDate();
       const daySquare = grid.children[day - 1];
-      if (entry.intensity === 1) daySquare.classList.add("first-level");
-      if (entry.intensity === 2) daySquare.classList.add("second-level");
-      if (entry.intensity === 3) daySquare.classList.add("third-level");
-      if (entry.intensity === 4) daySquare.classList.add("four-level");
-      if (entry.intensity === 5) daySquare.classList.add("five-level");
+      daySquare.classList.add("level-" + entry.intensity);
+
+      console.log("entry", entry);
+      console.log("day", day);
+      console.log("intensity", entry.intensity);
+      console.log("daySquare", daySquare);
     });
   } else {
     emptyState.style.display = "block";
