@@ -324,6 +324,8 @@ let startX = 0;
 let endX = 0;
 const grid = document.querySelector(".heatmap-grid");
 const emptyState = document.querySelector(".heatmap-empty-state");
+const tooltip = document.querySelector(".heatmap-tooltip");
+const heatmapContainer = document.querySelector(".heatmap-container");
 function renderHeatmap() {
   grid.innerHTML = "";
   const month = activeMonth.getMonth();
@@ -333,6 +335,33 @@ function renderHeatmap() {
   for (let i = 1; i <= daysInMonth; i++) {
     const newDiv = document.createElement("div");
     newDiv.classList.add("heatmap-day");
+    newDiv.addEventListener("mouseenter", function () {
+      if (!newDiv.entryData) return;
+
+      const entry = newDiv.entryData;
+
+      tooltip.textContent =
+        "Date: " +
+        entry.date +
+        " | Hours: " +
+        entry.hours +
+        " | Intensity: " +
+        entry.intensity;
+
+      const rect = newDiv.getBoundingClientRect();
+      const containerRect = heatmapContainer.getBoundingClientRect();
+
+      tooltip.style.left =
+        rect.left - containerRect.left + rect.width / 2 + "px";
+      tooltip.style.top =
+        rect.top - containerRect.top + rect.height + 12 + "px";
+
+      tooltip.style.display = "block";
+    });
+
+    newDiv.addEventListener("mouseleave", function () {
+      tooltip.style.display = "none";
+    });
     grid.appendChild(newDiv);
   }
 }
@@ -355,6 +384,8 @@ async function loadHeatmapData() {
       const day = new Date(entry.date).getDate();
       const daySquare = grid.children[day - 1];
       daySquare.classList.add("level-" + entry.intensity);
+
+      daySquare.entryData = entry;
 
       console.log("entry", entry);
       console.log("day", day);

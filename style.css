@@ -530,6 +530,25 @@ textarea.error {
   border: none;
   padding: 24px;
 }
+.heatmap-tooltip {
+  position: absolute;
+  display: none;
+  background-color: #2f3a4c;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateX(-50%);
+}
+
+.heatmap-container {
+  position: relative;
+}
 
 .heatmap-box.has-data .heatmap-empty-state {
   display: none;
