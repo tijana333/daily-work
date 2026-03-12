@@ -415,7 +415,6 @@ textarea.error {
   box-sizing: border-box;
 }
 .heatmap-box {
-  border: 1px dashed #d9dee7;
   border-radius: 16px;
   padding: 40px 24px;
 
@@ -515,6 +514,16 @@ textarea.error {
   height: 60px;
   border-radius: 6px;
   background-color: #f1f5f9;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.heatmap-day:hover {
+  transform: scale(1.05);
+  border-color: #7fb3e6;
+  box-shadow: 0 4px 10px rgba(47, 128, 201, 0.15);
 }
 
 .heatmap-box.has-data {
