@@ -326,6 +326,9 @@ const grid = document.querySelector(".heatmap-grid");
 const emptyState = document.querySelector(".heatmap-empty-state");
 const tooltip = document.querySelector(".heatmap-tooltip");
 const heatmapContainer = document.querySelector(".heatmap-container");
+const totalHours = document.getElementById(".total-hours");
+const daysLogged = document.getElementById(".days-logged");
+const avgIntensity = document.getElementById(".avg-intensity");
 function renderHeatmap() {
   console.log("renderHeatmap called");
   console.log("children before clear:", grid.children.length);
@@ -399,6 +402,24 @@ async function loadHeatmapData() {
     emptyState.style.display = "block";
     grid.style.display = "none";
   }
+
+  let totalHoursSum = 0;
+  let totalIntensity = 0;
+  entries.forEach(function (entry) {
+    totalHoursSum += entry.hours;
+    totalIntensity += entry.intensity;
+  });
+  let daysLoggedCount = entries.length;
+
+  if (entries.length > 0) {
+    averageIntensity = totalIntensity / daysLoggedCount;
+  } else {
+    averageIntensity = 0;
+  }
+
+  totalHours.textContent = totalHoursSum;
+  daysLogged.textContent = daysLoggedCount;
+  avgIntensity.textContent = averageIntensity.toFixed(1);
 }
 
 function renderMonth() {
