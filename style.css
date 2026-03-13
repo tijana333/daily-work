@@ -584,6 +584,7 @@ textarea.error {
 .stat-card {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 16px;
   padding: 22px 18px;
   background-color: #ffffff;
@@ -613,6 +614,7 @@ textarea.error {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .stat-value {
