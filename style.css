@@ -715,3 +715,24 @@ textarea.error {
     border-radius: 6px;
   }
 }
+@media (max-width: 380px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(7, 36px);
+    gap: 4px;
+  }
+
+  .heatmap-day {
+    width: 36px;
+    height: 36px;
+  }
+
+  .heatmap-box {
+    display: flex;
+    padding-right: 10px 6px;
+    justify-content: center;
+  }
+
+  .heatmap-legend {
+    font-size: 12px;
+  }
+}
