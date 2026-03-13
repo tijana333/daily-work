@@ -326,9 +326,9 @@ const grid = document.querySelector(".heatmap-grid");
 const emptyState = document.querySelector(".heatmap-empty-state");
 const tooltip = document.querySelector(".heatmap-tooltip");
 const heatmapContainer = document.querySelector(".heatmap-container");
-const totalHours = document.getElementById(".total-hours");
-const daysLogged = document.getElementById(".days-logged");
-const avgIntensity = document.getElementById(".avg-intensity");
+const totalHours = document.getElementById("total-hours");
+const daysLogged = document.getElementById("days-logged");
+const avgIntensity = document.getElementById("avg-intensity");
 function renderHeatmap() {
   console.log("renderHeatmap called");
   console.log("children before clear:", grid.children.length);
