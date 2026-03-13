@@ -327,6 +327,8 @@ const emptyState = document.querySelector(".heatmap-empty-state");
 const tooltip = document.querySelector(".heatmap-tooltip");
 const heatmapContainer = document.querySelector(".heatmap-container");
 function renderHeatmap() {
+  console.log("renderHeatmap called");
+  console.log("children before clear:", grid.children.length);
   grid.innerHTML = "";
   const month = activeMonth.getMonth();
   const year = activeMonth.getFullYear();
@@ -364,6 +366,7 @@ function renderHeatmap() {
     });
     grid.appendChild(newDiv);
   }
+  console.log("children after render:", grid.children.length);
 }
 
 async function loadHeatmapData() {
@@ -408,14 +411,12 @@ function renderMonth() {
 
 previousMonthButton.addEventListener("click", function () {
   activeMonth.setMonth(activeMonth.getMonth() - 1);
-  renderMonth();
-  loadHeatmapData();
+  updateHeatmapMonth();
 });
 
 nextMonthButton.addEventListener("click", function () {
   activeMonth.setMonth(activeMonth.getMonth() + 1);
-  renderMonth();
-  loadHeatmapData();
+  updateHeatmapMonth();
 });
 monthCarousel.addEventListener("touchstart", function (event) {
   startX = event.touches[0].clientX;
@@ -430,13 +431,15 @@ monthCarousel.addEventListener("touchend", function (event) {
   if (Math.abs(deltaX) < swipe_threshold) return;
   if (deltaX < 0) {
     activeMonth.setMonth(activeMonth.getMonth() + 1);
-    renderMonth();
+    updateHeatmapMonth();
   }
   if (deltaX > 0) {
     activeMonth.setMonth(activeMonth.getMonth() - 1);
-    renderMonth();
+    updateHeatmapMonth();
   }
 });
-renderMonth();
-renderHeatmap();
-loadHeatmapData();
+function updateHeatmapMonth() {
+  renderMonth();
+  renderHeatmap();
+  loadHeatmapData();
+}
