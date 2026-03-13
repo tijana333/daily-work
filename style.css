@@ -628,6 +628,7 @@ textarea.error {
   margin: 4px 0 0;
   font-size: 14px;
   color: #7b8794;
+  padding-left: 0px;
 }
 @media (max-width: 768px) {
   .container {
