@@ -1,4 +1,13 @@
+/* ========================================
+CONFIGURATION
+API endpoint used for all entry requests
+===========================================*/
 const API_URL = "https://daily-work-backend.vercel.app/api/entries";
+/* ========================================
+TAB NAVIGATION
+Handles switching between tabs and Loading
+entries when the entries tab is opened
+===========================================*/
 const tabs = document.querySelectorAll(".tab");
 tabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -18,6 +27,11 @@ tabs.forEach(function (tab) {
     document.getElementById(id).classList.add("active");
   });
 });
+/* ========================================
+  FORM SETUP
+  Initial DOM references, default values, 
+  loading state, and edit mode setup
+===========================================*/
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("date").value = today;
 
@@ -44,6 +58,11 @@ const todayDate = date.toISOString().substring(0, 10);
 dateElement.max = todayDate;
 let dateError = document.getElementById("date-error");
 
+/* ========================================
+  VALIDATION LOGIC
+  Validation functions and error handling 
+  for form fields
+===========================================*/
 function validateDate() {
   const dateValue = dateElement.value;
   dateError.classList.remove("show");
@@ -63,6 +82,11 @@ function validateDate() {
   return true;
 }
 const noteElement = document.getElementById("note");
+
+/* ========================================
+  API REQUEST
+  Loading a single entry by date
+===========================================*/
 
 async function loadEntryByDate(selectedDate) {
   console.log("Selected date:", selectedDate);
@@ -99,7 +123,10 @@ async function loadEntryByDate(selectedDate) {
     }
   });
 }
-
+/* ========================================
+  DATE INTERACTION  
+  Event listeners for form fields
+===========================================*/
 dateElement.addEventListener("change", function () {
   const isValid = validateDate();
   if (isValid === true) {
@@ -162,7 +189,10 @@ function validateChallenge() {
 challengeElement.addEventListener("input", function () {
   validateChallenge();
 });
-
+/* ========================================
+    API REQUEST 
+    Create and update entry
+===========================================*/
 async function updateEntry(id, entry) {
   setLoading(true);
   try {
@@ -226,7 +256,10 @@ async function submitEntry(entry) {
     setLoading(false);
   }
 }
-
+/* ========================================
+    ENTRIES LOADING
+    Fetch and render all entries
+===========================================*/
 async function loadEntries() {
   entriesList.textContent = "Loading...";
   try {
@@ -244,7 +277,10 @@ async function loadEntries() {
     entriesList.textContent = "Something went wrong!";
   }
 }
-
+/* ========================================
+  FORM SUBMISSION
+  Validate inputs and send entry to API
+===========================================*/
 form.addEventListener("submit", function (event) {
   event.preventDefault();
   let hasErrors = false;
@@ -290,7 +326,10 @@ form.addEventListener("submit", function (event) {
     submitEntry(entry);
   }
 });
-
+/* ========================================
+   INTENSITY BUTTON LOGIC  
+   Select intensity level
+===========================================*/
 let intensity = 1;
 const buttons = document.querySelectorAll(".intensity-button");
 buttons.forEach(function (button) {
@@ -312,6 +351,10 @@ buttons.forEach(function (button) {
     intensity = Number(buttonValue);
   });
 });
+/* ========================================
+  HEATMAP LOGIC 
+  Rendering and loading heatmap data
+===========================================*/
 
 /* ===== MONTH CAROUSEL ===== */
 
@@ -429,7 +472,10 @@ function renderMonth() {
   });
   currentMonthElement.textContent = monthText;
 }
-
+/* ========================================
+  MONTH CAROUSEL  
+  Month navigation and swipe handling
+===========================================*/
 previousMonthButton.addEventListener("click", function () {
   activeMonth.setMonth(activeMonth.getMonth() - 1);
   updateHeatmapMonth();
