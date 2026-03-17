@@ -287,15 +287,34 @@ async function loadEntries() {
     }
     entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     entriesList.innerHTML = entries
-      .map(
-        (entry) => ` <div class="entry-card">
-    <p><strong>Date:</strong> ${entry.date}</p>
-    <p><strong>Hours:</strong> ${entry.hours}</p>
-    <p><strong>Challenge:</strong> ${entry.challenge}</p>
-    <p><strong>Intensity:</strong> ${entry.intensity}</p>
-  </div>
-`,
-      )
+      .map((entry) => {
+        const date = new Date(entry.date);
+        const day = date.getDate();
+        const monthYear = date.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        });
+
+        return `
+    <div class="entry-card">
+      
+      <div class="entry-date">
+        <span class="day">${day}</span>
+        <span class="month">${monthYear}</span>
+      </div>
+
+      <div class="entry-content">
+        <div class="hours">${entry.hours} hours</div>
+        <div class="challenge">${entry.challenge}</div>
+      </div>
+
+      <div class="entry-intensity">
+        ${entry.intensity}
+      </div>
+
+    </div>
+  `;
+      })
       .join("");
   } catch (error) {
     entriesLoading.style.display = "none";
@@ -402,15 +421,18 @@ const thisMonthBtn = document.getElementById("this-month");
 const allEntriesBtn = document.getElementById("all-entries");
 thisMonthBtn.addEventListener("click", function () {
   currentView = "month";
+  thisMonthBtn.classList.add("active");
+  allEntriesBtn.classList.remove("active");
   loadEntries();
 });
 allEntriesBtn.addEventListener("click", function () {
   currentView = "all";
+  allEntriesBtn.classList.add("active");
+  thisMonthBtn.classList.remove("active");
+
   loadEntries();
 });
 function renderHeatmap() {
-  console.log("renderHeatmap called");
-  console.log("children before clear:", grid.children.length);
   grid.innerHTML = "";
   const month = activeMonth.getMonth();
   const year = activeMonth.getFullYear();
@@ -448,7 +470,6 @@ function renderHeatmap() {
     });
     grid.appendChild(newDiv);
   }
-  console.log("children after render:", grid.children.length);
 }
 
 async function loadHeatmapData() {
