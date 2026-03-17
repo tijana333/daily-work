@@ -567,3 +567,4 @@ function updateHeatmapMonth() {
   renderHeatmap();
   loadHeatmapData();
 }
+updateHeatmapMonth();
