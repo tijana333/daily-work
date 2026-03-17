@@ -40,6 +40,8 @@ const dateElement = document.getElementById("date");
 const successMsg = document.getElementById("success-message");
 const serverError = document.getElementById("server-error");
 const entriesList = document.getElementById("entries-list");
+const emptyStateMessage = document.getElementById("empty-state-message");
+const entriesLoading = document.getElementById("entries-loading");
 const submitBtn = form.querySelector('button[type="submit"]');
 const submitBtnText = submitBtn.querySelector("span");
 let editingEntryId = null;
@@ -261,19 +263,42 @@ async function submitEntry(entry) {
     Fetch and render all entries
 ===========================================*/
 async function loadEntries() {
-  entriesList.textContent = "Loading...";
+  entriesLoading.style.display = "block";
+  entriesList.style.display = "none";
+  emptyStateMessage.style.display = "none";
   try {
-    const response = await fetch(API_URL);
+    let url = API_URL;
+    if (currentView === "month") {
+      const date = new Date();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      url = API_URL + "?month=" + month + "&year=" + year;
+    }
+    const response = await fetch(url);
+    entriesLoading.style.display = "none";
     const data = await response.json();
     const entries = data.data;
+    if (entries.length === 0) {
+      emptyStateMessage.style.display = "block";
+      entriesList.style.display = "none";
+    } else {
+      emptyStateMessage.style.display = "none";
+      entriesList.style.display = "block";
+    }
+    entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     entriesList.innerHTML = entries
       .map(
-        (entry) => `<div class="entries">
-    data: ${entry.date}, hours: ${entry.hours}, intensity: ${entry.intensity}, challenge: ${entry.challenge}, note: ${entry.note}
-  </div>`,
+        (entry) => ` <div class="entry-card">
+    <p><strong>Date:</strong> ${entry.date}</p>
+    <p><strong>Hours:</strong> ${entry.hours}</p>
+    <p><strong>Challenge:</strong> ${entry.challenge}</p>
+    <p><strong>Intensity:</strong> ${entry.intensity}</p>
+  </div>
+`,
       )
       .join("");
   } catch (error) {
+    entriesLoading.style.display = "none";
     entriesList.textContent = "Something went wrong!";
   }
 }
@@ -372,6 +397,17 @@ const heatmapContainer = document.querySelector(".heatmap-container");
 const totalHours = document.getElementById("total-hours");
 const daysLogged = document.getElementById("days-logged");
 const avgIntensity = document.getElementById("avg-intensity");
+let currentView = "month";
+const thisMonthBtn = document.getElementById("this-month");
+const allEntriesBtn = document.getElementById("all-entries");
+thisMonthBtn.addEventListener("click", function () {
+  currentView = "month";
+  loadEntries();
+});
+allEntriesBtn.addEventListener("click", function () {
+  currentView = "all";
+  loadEntries();
+});
 function renderHeatmap() {
   console.log("renderHeatmap called");
   console.log("children before clear:", grid.children.length);
