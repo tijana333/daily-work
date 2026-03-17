@@ -413,8 +413,62 @@
     <span id="no-entries">No entries found</span>
     <span id="start-entries">Start logging your work...</span>
   </div>
-
   <div id="entries-list"></div>
+</div>
+
+<div id="entry-details-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-box">
+    <button id="close-entry-modal" class="modal-close" type="button">
+      <i data-lucide="x"></i>
+    </button>
+
+    <h2>Entry Details</h2>
+
+    <div class="form-group">
+      <div class="form-label">
+        <i data-lucide="calendar" class="label-icon"></i>
+        <label>Date</label>
+      </div>
+      <input type="date" id="modal-date" disabled />
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <i data-lucide="clock" class="label-icon"></i>
+        <label>Hours worked</label>
+      </div>
+      <input type="number" id="modal-hours" disabled />
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <i data-lucide="zap" class="label-icon"></i>
+        <label>Intensity</label>
+      </div>
+      <input type="text" id="modal-intensity" disabled />
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <i data-lucide="target" class="label-icon"></i>
+        <label>Today's challenge</label>
+      </div>
+      <input type="text" id="modal-challenge" disabled />
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <i data-lucide="message-circle" class="label-icon"></i>
+        <label>Personal note</label>
+      </div>
+      <textarea id="modal-note" rows="5" disabled></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button id="edit-entry-btn" type="button">Edit</button>
+      <button id="delete-entry-btn" type="button">Delete</button>
+    </div>
+  </div>
 </div>
     <!-- JavaScript -->
     <script src="index.js"></script>
