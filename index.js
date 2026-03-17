@@ -283,7 +283,7 @@ async function loadEntries() {
       entriesList.style.display = "none";
     } else {
       emptyStateMessage.style.display = "none";
-      entriesList.style.display = "block";
+      entriesList.style.display = "flex";
     }
     entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     entriesList.innerHTML = entries
