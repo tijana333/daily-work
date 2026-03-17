@@ -657,12 +657,17 @@ textarea.error {
 }
 
 .entries-button.active {
-  background: linear-gradient(135deg, #8ec5f8, #5e95d8);
+  background: #6ea3e2;
   color: white;
-  border-color: transparent;
+  border: 1px solid #6ea3e2;
+  box-shadow: none;
 }
 
 #entries-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
   color: #6b7a90;
   font-size: 15px;
   font-weight: 500;
@@ -694,7 +699,7 @@ textarea.error {
 #entries-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   margin-top: 20px;
 }
 

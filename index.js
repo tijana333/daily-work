@@ -263,7 +263,7 @@ async function submitEntry(entry) {
     Fetch and render all entries
 ===========================================*/
 async function loadEntries() {
-  entriesLoading.style.display = "block";
+  entriesLoading.style.display = "flex";
   entriesList.style.display = "none";
   emptyStateMessage.style.display = "none";
   try {
