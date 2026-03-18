@@ -42,6 +42,42 @@ const serverError = document.getElementById("server-error");
 const entriesList = document.getElementById("entries-list");
 const emptyStateMessage = document.getElementById("empty-state-message");
 const entriesLoading = document.getElementById("entries-loading");
+const entryDetailsModal = document.getElementById("entry-details-modal");
+const closeEntryModal = document.getElementById("close-entry-modal");
+const modalDate = document.getElementById("modal-date");
+const modalHours = document.getElementById("modal-hours");
+const modalIntensity = document.getElementById("modal-intensity");
+const modalChallenge = document.getElementById("modal-challenge");
+const modalNote = document.getElementById("modal-note");
+const editBtn = document.getElementById("edit-entry-btn");
+editBtn.addEventListener("click", function () {
+  tabs.forEach(function (tbs) {
+    tbs.classList.remove("active");
+  });
+  const dataTab = document.querySelector(`[data-tab="today"]`);
+  dataTab.classList.add("active");
+  const content = document.querySelectorAll(".tab-content");
+  content.forEach((c) => c.classList.remove("active"));
+  const todaySection = document.getElementById("today-section");
+  todatSection.classList.add("active");
+
+  dateElement.value = selectedEntry.date;
+  hoursElement.value = selectedEntry.hours;
+  challengeElement.value = selectedEntry.challenge;
+  noteElement.value = selectedEntry.note;
+});
+
+let selectedEntry = null;
+
+function openEntryModal(entry) {
+  selectedEntry = entry;
+  modalDate.value = entry.date;
+  modalHours.value = entry.hours;
+  modalIntensity.value = entry.intensity;
+  modalChallenge.value = entry.challenge;
+  modalNote.value = entry.note || "";
+  entryDetailsModal.style.display = "flex";
+}
 const submitBtn = form.querySelector('button[type="submit"]');
 const submitBtnText = submitBtn.querySelector("span");
 let editingEntryId = null;
@@ -296,7 +332,7 @@ async function loadEntries() {
         });
 
         return `
-    <div class="entry-card">
+    <div class="entry-card" data-id="${entry._id}">
       
       <div class="entry-date">
         <span class="day">${day}</span>
@@ -316,11 +352,23 @@ async function loadEntries() {
   `;
       })
       .join("");
+
+    const cards = document.querySelectorAll(".entry-card");
+    cards.forEach(function (card) {
+      card.addEventListener("click", function (element) {
+        const data = card.getAttribute("data-id");
+        const data_id = entries.find((entry) => entry._id === data);
+        openEntryModal(data_id);
+      });
+    });
   } catch (error) {
     entriesLoading.style.display = "none";
     entriesList.textContent = "Something went wrong!";
   }
 }
+closeEntryModal.addEventListener("click", function (element) {
+  entryDetailsModal.style.display = "none";
+});
 /* ========================================
   FORM SUBMISSION
   Validate inputs and send entry to API
