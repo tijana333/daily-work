@@ -44,6 +44,7 @@ const emptyStateMessage = document.getElementById("empty-state-message");
 const entriesLoading = document.getElementById("entries-loading");
 const entryDetailsModal = document.getElementById("entry-details-modal");
 const closeEntryModal = document.getElementById("close-entry-modal");
+const deleteEntryButton = document.getElementById("delete-entry-btn");
 const modalDate = document.getElementById("modal-date");
 const modalHours = document.getElementById("modal-hours");
 const modalIntensity = document.getElementById("modal-intensity");
@@ -51,6 +52,7 @@ const modalChallenge = document.getElementById("modal-challenge");
 const modalNote = document.getElementById("modal-note");
 const editBtn = document.getElementById("edit-entry-btn");
 editBtn.addEventListener("click", function () {
+  entryDetailsModal.style.display = "none";
   tabs.forEach(function (tbs) {
     tbs.classList.remove("active");
   });
@@ -59,12 +61,22 @@ editBtn.addEventListener("click", function () {
   const content = document.querySelectorAll(".tab-content");
   content.forEach((c) => c.classList.remove("active"));
   const todaySection = document.getElementById("today-section");
-  todatSection.classList.add("active");
+  todaySection.classList.add("active");
+  editingEntryId = selectedEntry._id;
+  submitBtnText.textContent = "Update Entry";
 
   dateElement.value = selectedEntry.date;
   hoursElement.value = selectedEntry.hours;
   challengeElement.value = selectedEntry.challenge;
   noteElement.value = selectedEntry.note;
+  intensity = selectedEntry.intensity;
+  buttons.forEach(function (intensityButton) {
+    intensityButton.classList.remove("active");
+    const numberSpan = intensityButton.querySelector(".tab-number");
+    if (numberSpan.textContent == selectedEntry.intensity) {
+      intensityButton.classList.add("active");
+    }
+  });
 });
 
 let selectedEntry = null;
@@ -368,6 +380,16 @@ async function loadEntries() {
 }
 closeEntryModal.addEventListener("click", function (element) {
   entryDetailsModal.style.display = "none";
+});
+deleteEntryButton.addEventListener("click", async function () {
+  if (confirm("Are you sure you want to delete this entry?")) {
+    await fetch(API_URL + "/" + selectedEntry._id, {
+      method: "DELETE",
+    });
+    entryDetailsModal.style.display = "none";
+    loadEntries();
+    alert("Entry deleted successfully");
+  }
 });
 /* ========================================
   FORM SUBMISSION
