@@ -6,11 +6,14 @@ import {
 
 import { initTabs } from "./tabs.js";
 
+import { initEntries } from "./entries.js";
 /* ========================================
   FORM SETUP
   Initial DOM references, default values, 
   loading state, and edit mode setup
 ===========================================*/
+const API_URL = "https://daily-work-backend.vercel.app/api/entries";
+
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("date").value = today;
 
@@ -455,4 +458,5 @@ function updateHeatmapMonth() {
   loadHeatmapData();
 }
 updateHeatmapMonth();
+const { loadEntries } = initEntries();
 initTabs(loadEntries);
