@@ -7,6 +7,8 @@ import {
   validateHours,
   validateChallenge,
 } from "./validation.js";
+
+import { initTabs } from "./tabs.js";
 const API_URL = "https://daily-work-backend.vercel.app/api/entries";
 /* ========================================
 TAB NAVIGATION
@@ -577,3 +579,4 @@ function updateHeatmapMonth() {
   loadHeatmapData();
 }
 updateHeatmapMonth();
+initTabs(loadEntries);
