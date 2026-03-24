@@ -46,6 +46,11 @@ export function initForm() {
     }
   }
 
+  function hideMessages() {
+    successMsg.style.display = "none";
+    serverError.style.display = "none";
+  }
+
   function fillFormForEdit(entry) {
     const tabs = document.querySelectorAll(".tab");
     tabs.forEach((t) => t.classList.remove("active"));
@@ -79,18 +84,87 @@ export function initForm() {
 
   async function updateEntry(id, entry) {
     setLoading(true);
-    await editEntry(id, entry);
-    setLoading(false);
+    hideMessages();
+
+    try {
+      const response = await editEntry(id, entry);
+
+      if (response.status === 200 || response.ok) {
+        successMsg.textContent = "Entry updated successfully!";
+        successMsg.style.display = "block";
+      } else {
+        serverError.textContent = "Update failed!";
+        serverError.style.display = "block";
+      }
+    } catch (error) {
+      serverError.textContent = "Update failed!";
+      serverError.style.display = "block";
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function submitEntry(entry) {
     setLoading(true);
-    await createEntry(entry);
-    setLoading(false);
+    hideMessages();
+
+    try {
+      const response = await createEntry(entry);
+
+      if (response.status === 409) {
+        serverError.textContent = "Entry for this date already exists";
+        serverError.style.display = "block";
+        return;
+      }
+
+      if (response.status === 201 || response.ok) {
+        successMsg.textContent = "Entry saved successfully!";
+        successMsg.style.display = "block";
+
+        form.reset();
+        dateElement.value = today;
+        intensity = 1;
+        editingEntryId = null;
+        submitBtnText.textContent = "Save Entry";
+
+        buttons.forEach((button) => {
+          button.classList.remove("active");
+          const num = button.querySelector(".tab-number");
+          if (num.textContent === "1") {
+            button.classList.add("active");
+          }
+        });
+      } else {
+        serverError.textContent = "Something went wrong!";
+        serverError.style.display = "block";
+      }
+    } catch (error) {
+      serverError.textContent = "Something went wrong!";
+      serverError.style.display = "block";
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();
+    hideMessages();
+
+    let hasErrors = false;
+
+    const isValidDate = validateDate(dateElement, dateError, todayDate);
+    if (!isValidDate) hasErrors = true;
+
+    const isValidHours = validateHours(hoursElement, hoursError);
+    if (!isValidHours) hasErrors = true;
+
+    const isValidChallenge = validateChallenge(
+      challengeElement,
+      challengeError,
+    );
+    if (!isValidChallenge) hasErrors = true;
 
     const entry = {
       date: dateElement.value,
@@ -99,6 +173,10 @@ export function initForm() {
       challenge: challengeElement.value.trim(),
       note: noteElement.value.trim(),
     };
+
+    if (hasErrors) {
+      return;
+    }
 
     if (editingEntryId) {
       updateEntry(editingEntryId, entry);

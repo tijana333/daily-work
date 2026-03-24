@@ -546,10 +546,6 @@ textarea.error {
   transform: translateX(-50%);
 }
 
-.heatmap-container {
-  position: relative;
-}
-
 .heatmap-box.has-data .heatmap-empty-state {
   display: none;
 }
