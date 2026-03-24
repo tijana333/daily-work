@@ -1,9 +1,10 @@
 export function validateDate(dateElement, dateError, todayDate) {
   const dateValue = dateElement.value;
+
   dateError.classList.remove("show");
   dateElement.classList.remove("error");
 
-  if (dateValue.length == 0) {
+  if (dateValue.length === 0) {
     dateError.textContent = "Select date!";
     dateError.classList.add("show");
     dateElement.classList.add("error");
@@ -14,11 +15,13 @@ export function validateDate(dateElement, dateError, todayDate) {
     dateElement.classList.add("error");
     return false;
   }
+
   return true;
 }
 
 export function validateHours(hoursElement, hoursError) {
   const hoursValue = Number(hoursElement.value);
+
   hoursError.textContent = "";
   hoursError.classList.remove("show");
   hoursElement.classList.remove("error");
@@ -39,11 +42,13 @@ export function validateHours(hoursElement, hoursError) {
     hoursElement.classList.add("error");
     return false;
   }
+
   return true;
 }
 
 export function validateChallenge(challengeElement, challengeError) {
   const challengeValue = challengeElement.value.trim();
+
   challengeError.textContent = "";
   challengeError.classList.remove("show");
   challengeElement.classList.remove("error");
@@ -59,5 +64,6 @@ export function validateChallenge(challengeElement, challengeError) {
     challengeElement.classList.add("error");
     return false;
   }
+
   return true;
 }
