@@ -1,3 +1,10 @@
+import {
+  submitEntry as submitEntryApi,
+  updateEntry as updateEntryApi,
+  loadEntryByDate as loadEntryByDateApi,
+  loadEntries as loadEntriesApi,
+} from "./api/entriesApi.js";
+
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -140,7 +147,7 @@ const noteElement = document.getElementById("note");
 
 async function loadEntryByDate(selectedDate) {
   console.log("Selected date:", selectedDate);
-  const response = await fetch(API_URL + "?date=" + selectedDate);
+  const response = await loadEntryByDateApi(selectedDate);
   console.log(response);
 
   if (response.status === 404) {
@@ -246,11 +253,7 @@ challengeElement.addEventListener("input", function () {
 async function updateEntry(id, entry) {
   setLoading(true);
   try {
-    const response = await fetch(API_URL + "/" + id, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    });
+    const response = await updateEntryApi(id, entry);
 
     if (response.status === 200) {
       successMsg.textContent = "Entry updated successfully!";
@@ -272,11 +275,7 @@ async function updateEntry(id, entry) {
 async function submitEntry(entry) {
   setLoading(true);
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    });
+    const response = await submitEntryApi(entry);
     if (response.status === 409) {
       serverError.textContent = "Entry for this date already exists";
       serverError.style.display = "block";
@@ -314,15 +313,15 @@ async function loadEntries() {
   entriesLoading.style.display = "flex";
   entriesList.style.display = "none";
   emptyStateMessage.style.display = "none";
+  let url = API_URL;
   try {
-    let url = API_URL;
     if (currentView === "month") {
       const date = new Date();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
       url = API_URL + "?month=" + month + "&year=" + year;
     }
-    const response = await fetch(url);
+    const response = await loadEntriesApi(url);
     entriesLoading.style.display = "none";
     const data = await response.json();
     const entries = data.data;
@@ -479,6 +478,8 @@ const monthCarousel = document.getElementById("month-carousel");
 let activeMonth = new Date();
 let startX = 0;
 let endX = 0;
+let startY = 0;
+let endY = 0;
 const grid = document.querySelector(".heatmap-grid");
 const emptyState = document.querySelector(".heatmap-empty-state");
 const tooltip = document.querySelector(".heatmap-tooltip");
@@ -580,6 +581,7 @@ async function loadHeatmapData() {
     totalIntensity += entry.intensity;
   });
   let daysLoggedCount = entries.length;
+  let averageIntensity;
 
   if (entries.length > 0) {
     averageIntensity = totalIntensity / daysLoggedCount;
