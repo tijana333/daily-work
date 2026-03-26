@@ -6,7 +6,11 @@ export async function submitEntry(entry) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(entry),
   });
-  return response;
+  const data = await response.json();
+  return {
+    status: response.status,
+    data,
+  };
 }
 
 export async function updateEntry(id, entry) {
@@ -15,14 +19,26 @@ export async function updateEntry(id, entry) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(entry),
   });
-  return response;
+  const data = await response.json();
+  return {
+    status: response.status,
+    data,
+  };
 }
 
 export async function loadEntryByDate(selectedDate) {
   const response = await fetch(API_URL + "?date=" + selectedDate);
-  return response;
+  const data = await response.json();
+  return {
+    status: response.status,
+    data,
+  };
 }
 export async function loadEntries(url) {
   const response = await fetch(url);
-  return response;
+  const data = await response.json();
+  return {
+    status: response.status,
+    data,
+  };
 }

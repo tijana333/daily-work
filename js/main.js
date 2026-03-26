@@ -147,15 +147,15 @@ const noteElement = document.getElementById("note");
 
 async function loadEntryByDate(selectedDate) {
   console.log("Selected date:", selectedDate);
-  const response = await loadEntryByDateApi(selectedDate);
-  console.log(response);
+  const result = await loadEntryByDateApi(selectedDate);
+  console.log(result);
 
-  if (response.status === 404) {
+  if (result.status === 404) {
     editingEntryId = null;
     submitBtnText.textContent = "Save Entry";
     return;
   }
-  const data = await response.json();
+  const data = result.data;
   if (!data.data[0]) {
     editingEntryId = null;
     submitBtnText.textContent = "Save Entry";
@@ -253,9 +253,9 @@ challengeElement.addEventListener("input", function () {
 async function updateEntry(id, entry) {
   setLoading(true);
   try {
-    const response = await updateEntryApi(id, entry);
+    const result = await updateEntryApi(id, entry);
 
-    if (response.status === 200) {
+    if (result.status === 200) {
       successMsg.textContent = "Entry updated successfully!";
       successMsg.style.display = "block";
       serverError.style.display = "none";
@@ -275,14 +275,14 @@ async function updateEntry(id, entry) {
 async function submitEntry(entry) {
   setLoading(true);
   try {
-    const response = await submitEntryApi(entry);
-    if (response.status === 409) {
+    const result = await submitEntryApi(entry);
+    if (result.status === 409) {
       serverError.textContent = "Entry for this date already exists";
       serverError.style.display = "block";
       successMsg.style.display = "none";
       return;
     }
-    if (response.status === 201) {
+    if (result.status === 201) {
       form.reset();
       intensity = 1;
       successMsg.style.display = "block";
@@ -321,9 +321,9 @@ async function loadEntries() {
       const year = date.getFullYear();
       url = API_URL + "?month=" + month + "&year=" + year;
     }
-    const response = await loadEntriesApi(url);
+    const result = await loadEntriesApi(url);
     entriesLoading.style.display = "none";
-    const data = await response.json();
+    const data = result.data;
     const entries = data.data;
     if (entries.length === 0) {
       emptyStateMessage.style.display = "block";
