@@ -5,6 +5,12 @@ import {
   loadEntries as loadEntriesApi,
 } from "./api/entriesApi.js";
 
+import {
+  validateDate,
+  validateHours,
+  validateChallenge,
+} from "./utils/validators.js";
+
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -120,24 +126,6 @@ let dateError = document.getElementById("date-error");
   Validation functions and error handling 
   for form fields
 ===========================================*/
-function validateDate() {
-  const dateValue = dateElement.value;
-  dateError.classList.remove("show");
-  dateElement.classList.remove("error");
-
-  if (dateValue.length == 0) {
-    dateError.textContent = "Select date!";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
-    return false;
-  } else if (dateValue > todayDate) {
-    dateError.textContent = "Date cannot be in the future";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
-    return false;
-  }
-  return true;
-}
 const noteElement = document.getElementById("note");
 
 /* ========================================
@@ -185,7 +173,7 @@ async function loadEntryByDate(selectedDate) {
   Event listeners for form fields
 ===========================================*/
 dateElement.addEventListener("change", function () {
-  const isValid = validateDate();
+  const isValid = validateDate(dateElement, dateError, todayDate);
   if (isValid === true) {
     loadEntryByDate(dateElement.value);
   }
@@ -193,58 +181,15 @@ dateElement.addEventListener("change", function () {
 const hoursElement = document.getElementById("number");
 let hoursError = document.getElementById("hours-error");
 
-function validateHours() {
-  const hoursValue = Number(hoursElement.value);
-  hoursError.textContent = "";
-  hoursError.classList.remove("show");
-  hoursElement.classList.remove("error");
-
-  if (hoursElement.value === "") {
-    hoursError.textContent = "Select hours!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    return false;
-  } else if (isNaN(hoursValue)) {
-    hoursError.textContent = "Hours must be a number!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    return false;
-  } else if (hoursValue < 0 || hoursValue > 24) {
-    hoursError.textContent = "Hours must be between 0 and 24";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    return false;
-  }
-  return true;
-}
 hoursElement.addEventListener("input", function () {
-  validateHours();
+  validateHours(hoursElement, hoursError);
 });
 
 let challengeError = document.getElementById("challenge-error");
 const challengeElement = document.getElementById("text");
 
-function validateChallenge() {
-  const challengeValue = challengeElement.value.trim();
-  challengeError.textContent = "";
-  challengeError.classList.remove("show");
-  challengeElement.classList.remove("error");
-
-  if (challengeValue === "") {
-    challengeError.textContent = "Challenge is required";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
-    return false;
-  } else if (challengeValue.length > 100) {
-    challengeError.textContent = "Maximum 100 characters";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
-    return false;
-  }
-  return true;
-}
 challengeElement.addEventListener("input", function () {
-  validateChallenge();
+  validateChallenge(challengeElement, challengeError);
 });
 /* ========================================
     API REQUEST 
@@ -398,15 +343,16 @@ form.addEventListener("submit", function (event) {
   event.preventDefault();
   let hasErrors = false;
 
-  const isValidHours = validateHours();
+  const isValidHours = validateHours(hoursElement, hoursError);
+
   if (!isValidHours) {
     hasErrors = true;
   }
-  const isValidChallenge = validateChallenge();
+  const isValidChallenge = validateChallenge(challengeElement, challengeError);
   if (!isValidChallenge) {
     hasErrors = true;
   }
-  const isValidDate = validateDate();
+  const isValidDate = validateDate(dateElement, dateError, todayDate);
   if (!isValidDate) {
     hasErrors = true;
   }
