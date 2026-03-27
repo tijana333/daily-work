@@ -1,5 +1,6 @@
 import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
 import { startEditingEntry, initForm } from "./features/form.js";
+import { initTabs } from "./features/tabs.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -10,25 +11,6 @@ TAB NAVIGATION
 Handles switching between tabs and Loading
 entries when the entries tab is opened
 ===========================================*/
-const tabs = document.querySelectorAll(".tab");
-tabs.forEach(function (tab) {
-  tab.addEventListener("click", function () {
-    tabs.forEach(function (tbs) {
-      tbs.classList.remove("active");
-    });
-    tab.classList.add("active");
-    const content = document.querySelectorAll(".tab-content");
-    content.forEach((c) => c.classList.remove("active"));
-
-    const name = tab.dataset.tab;
-    const id = name + "-section";
-    if (name === "entries") {
-      loadEntries();
-    }
-
-    document.getElementById(id).classList.add("active");
-  });
-});
 
 const entriesList = document.getElementById("entries-list");
 const emptyStateMessage = document.getElementById("empty-state-message");
@@ -42,6 +24,7 @@ const modalIntensity = document.getElementById("modal-intensity");
 const modalChallenge = document.getElementById("modal-challenge");
 const modalNote = document.getElementById("modal-note");
 const editBtn = document.getElementById("edit-entry-btn");
+const tabs = document.querySelectorAll(".tab");
 editBtn.addEventListener("click", function () {
   entryDetailsModal.style.display = "none";
   tabs.forEach(function (tbs) {
@@ -72,7 +55,7 @@ function openEntryModal(entry) {
     ENTRIES LOADING
     Fetch and render all entries
 ===========================================*/
-async function loadEntries() {
+export async function loadEntries() {
   entriesLoading.style.display = "flex";
   entriesList.style.display = "none";
   emptyStateMessage.style.display = "none";
@@ -326,3 +309,4 @@ function updateHeatmapMonth() {
 }
 updateHeatmapMonth();
 initForm();
+initTabs();
