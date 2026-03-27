@@ -48,10 +48,6 @@ tabs.forEach(function (tab) {
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("date").value = today;
 
-const form = document.getElementById("entry-form");
-const dateElement = document.getElementById("date");
-const successMsg = document.getElementById("success-message");
-const serverError = document.getElementById("server-error");
 const entriesList = document.getElementById("entries-list");
 const emptyStateMessage = document.getElementById("empty-state-message");
 const entriesLoading = document.getElementById("entries-loading");
@@ -103,8 +99,6 @@ function openEntryModal(entry) {
   modalNote.value = entry.note || "";
   entryDetailsModal.style.display = "flex";
 }
-const submitBtn = form.querySelector('button[type="submit"]');
-const submitBtnText = submitBtn.querySelector("span");
 let editingEntryId = null;
 const originalSubmitButtonText = submitBtnText.textContent;
 function setLoading(isLoading) {
@@ -126,7 +120,6 @@ let dateError = document.getElementById("date-error");
   Validation functions and error handling 
   for form fields
 ===========================================*/
-const noteElement = document.getElementById("note");
 
 /* ========================================
   API REQUEST
@@ -178,7 +171,6 @@ dateElement.addEventListener("change", function () {
     loadEntryByDate(dateElement.value);
   }
 });
-const hoursElement = document.getElementById("number");
 let hoursError = document.getElementById("hours-error");
 
 hoursElement.addEventListener("input", function () {
@@ -186,7 +178,6 @@ hoursElement.addEventListener("input", function () {
 });
 
 let challengeError = document.getElementById("challenge-error");
-const challengeElement = document.getElementById("text");
 
 challengeElement.addEventListener("input", function () {
   validateChallenge(challengeElement, challengeError);
@@ -232,7 +223,6 @@ async function submitEntry(entry) {
       intensity = 1;
       successMsg.style.display = "block";
       serverError.style.display = "none";
-      const buttons = document.querySelectorAll(".intensity-button");
       buttons.forEach(function (button) {
         const numberSpan = button.querySelector(".tab-number");
         const spanValue = numberSpan.textContent;
