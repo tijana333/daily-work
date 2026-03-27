@@ -1,16 +1,5 @@
-import {
-  submitEntry as submitEntryApi,
-  updateEntry as updateEntryApi,
-  loadEntryByDate as loadEntryByDateApi,
-  loadEntries as loadEntriesApi,
-} from "./api/entriesApi.js";
-
-import {
-  validateDate,
-  validateHours,
-  validateChallenge,
-} from "./utils/validators.js";
-
+import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
+import { startEditingEntry, initForm } from "./features/form.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -40,13 +29,6 @@ tabs.forEach(function (tab) {
     document.getElementById(id).classList.add("active");
   });
 });
-/* ========================================
-  FORM SETUP
-  Initial DOM references, default values, 
-  loading state, and edit mode setup
-===========================================*/
-const today = new Date().toISOString().split("T")[0];
-document.getElementById("date").value = today;
 
 const entriesList = document.getElementById("entries-list");
 const emptyStateMessage = document.getElementById("empty-state-message");
@@ -71,21 +53,7 @@ editBtn.addEventListener("click", function () {
   content.forEach((c) => c.classList.remove("active"));
   const todaySection = document.getElementById("today-section");
   todaySection.classList.add("active");
-  editingEntryId = selectedEntry._id;
-  submitBtnText.textContent = "Update Entry";
-
-  dateElement.value = selectedEntry.date;
-  hoursElement.value = selectedEntry.hours;
-  challengeElement.value = selectedEntry.challenge;
-  noteElement.value = selectedEntry.note;
-  intensity = selectedEntry.intensity;
-  buttons.forEach(function (intensityButton) {
-    intensityButton.classList.remove("active");
-    const numberSpan = intensityButton.querySelector(".tab-number");
-    if (numberSpan.textContent == selectedEntry.intensity) {
-      intensityButton.classList.add("active");
-    }
-  });
+  startEditingEntry(selectedEntry);
 });
 
 let selectedEntry = null;
@@ -99,147 +67,7 @@ function openEntryModal(entry) {
   modalNote.value = entry.note || "";
   entryDetailsModal.style.display = "flex";
 }
-let editingEntryId = null;
-const originalSubmitButtonText = submitBtnText.textContent;
-function setLoading(isLoading) {
-  if (isLoading === true) {
-    submitBtnText.textContent = "Saving...";
-    submitBtn.disabled = true;
-  } else {
-    submitBtnText.textContent = originalSubmitButtonText;
-    submitBtn.disabled = false;
-  }
-}
-const date = new Date();
-const todayDate = date.toISOString().substring(0, 10);
-dateElement.max = todayDate;
-let dateError = document.getElementById("date-error");
 
-/* ========================================
-  VALIDATION LOGIC
-  Validation functions and error handling 
-  for form fields
-===========================================*/
-
-/* ========================================
-  API REQUEST
-  Loading a single entry by date
-===========================================*/
-
-async function loadEntryByDate(selectedDate) {
-  console.log("Selected date:", selectedDate);
-  const result = await loadEntryByDateApi(selectedDate);
-  console.log(result);
-
-  if (result.status === 404) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const data = result.data;
-  if (!data.data[0]) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const entry = data.data[0];
-  if (data.data[0]) {
-    editingEntryId = entry._id;
-    console.log("SET ID:", editingEntryId);
-    submitBtnText.textContent = "Update Entry";
-  }
-  console.log("ENTRY:", entry);
-  hoursElement.value = entry.hours || "";
-  challengeElement.value = entry.challenge;
-  noteElement.value = entry.note || "";
-
-  buttons.forEach(function (button) {
-    button.classList.remove("active");
-    const numberSpan = button.querySelector(".tab-number");
-    if (numberSpan.textContent == entry.intensity) {
-      button.classList.add("active");
-    }
-  });
-}
-/* ========================================
-  DATE INTERACTION  
-  Event listeners for form fields
-===========================================*/
-dateElement.addEventListener("change", function () {
-  const isValid = validateDate(dateElement, dateError, todayDate);
-  if (isValid === true) {
-    loadEntryByDate(dateElement.value);
-  }
-});
-let hoursError = document.getElementById("hours-error");
-
-hoursElement.addEventListener("input", function () {
-  validateHours(hoursElement, hoursError);
-});
-
-let challengeError = document.getElementById("challenge-error");
-
-challengeElement.addEventListener("input", function () {
-  validateChallenge(challengeElement, challengeError);
-});
-/* ========================================
-    API REQUEST 
-    Create and update entry
-===========================================*/
-async function updateEntry(id, entry) {
-  setLoading(true);
-  try {
-    const result = await updateEntryApi(id, entry);
-
-    if (result.status === 200) {
-      successMsg.textContent = "Entry updated successfully!";
-      successMsg.style.display = "block";
-      serverError.style.display = "none";
-    } else {
-      serverError.textContent = "Update failed!";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
-    }
-  } catch (error) {
-    serverError.textContent = "Update failed!";
-    serverError.style.display = "block";
-    successMsg.style.display = "none";
-  } finally {
-    setLoading(false);
-  }
-}
-async function submitEntry(entry) {
-  setLoading(true);
-  try {
-    const result = await submitEntryApi(entry);
-    if (result.status === 409) {
-      serverError.textContent = "Entry for this date already exists";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
-      return;
-    }
-    if (result.status === 201) {
-      form.reset();
-      intensity = 1;
-      successMsg.style.display = "block";
-      serverError.style.display = "none";
-      buttons.forEach(function (button) {
-        const numberSpan = button.querySelector(".tab-number");
-        const spanValue = numberSpan.textContent;
-        button.classList.remove("active");
-        if (spanValue === "1") {
-          button.classList.add("active");
-        }
-      });
-    } else {
-      serverError.textContent = "Something went wrong!";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
-    }
-  } finally {
-    setLoading(false);
-  }
-}
 /* ========================================
     ENTRIES LOADING
     Fetch and render all entries
@@ -325,85 +153,6 @@ deleteEntryButton.addEventListener("click", async function () {
     alert("Entry deleted successfully");
   }
 });
-/* ========================================
-  FORM SUBMISSION
-  Validate inputs and send entry to API
-===========================================*/
-form.addEventListener("submit", function (event) {
-  event.preventDefault();
-  let hasErrors = false;
-
-  const isValidHours = validateHours(hoursElement, hoursError);
-
-  if (!isValidHours) {
-    hasErrors = true;
-  }
-  const isValidChallenge = validateChallenge(challengeElement, challengeError);
-  if (!isValidChallenge) {
-    hasErrors = true;
-  }
-  const isValidDate = validateDate(dateElement, dateError, todayDate);
-  if (!isValidDate) {
-    hasErrors = true;
-  }
-  let noteError = document.getElementById("note-error");
-  const noteValue = noteElement.value.trim();
-
-  noteError.textContent = "";
-  noteError.classList.remove("show");
-  noteElement.classList.remove("error");
-
-  if (noteValue !== "" && noteValue.length > 500) {
-    noteError.textContent = "Maximum 500 characters";
-    noteError.classList.add("show");
-    noteElement.classList.add("error");
-    hasErrors = true;
-  }
-  if (hasErrors) {
-    return;
-  }
-  const entry = {
-    date: dateElement.value,
-    hours: Number(hoursElement.value),
-    intensity: intensity,
-    challenge: challengeElement.value.trim(),
-    note: noteValue,
-  };
-  if (editingEntryId) {
-    updateEntry(editingEntryId, entry);
-  } else {
-    submitEntry(entry);
-  }
-});
-/* ========================================
-   INTENSITY BUTTON LOGIC  
-   Select intensity level
-===========================================*/
-let intensity = 1;
-const buttons = document.querySelectorAll(".intensity-button");
-buttons.forEach(function (button) {
-  const numberSpan = button.querySelector(".tab-number");
-  const spanValue = numberSpan.textContent;
-  if (spanValue === "1") {
-    button.classList.add("active");
-  }
-});
-
-buttons.forEach(function (button) {
-  button.addEventListener("click", function (element) {
-    buttons.forEach(function (btn) {
-      btn.classList.remove("active");
-    });
-    button.classList.add("active");
-    const numberSpan = button.querySelector(".tab-number");
-    const buttonValue = numberSpan.textContent;
-    intensity = Number(buttonValue);
-  });
-});
-/* ========================================
-  HEATMAP LOGIC 
-  Rendering and loading heatmap data
-===========================================*/
 
 /* ===== MONTH CAROUSEL ===== */
 
@@ -576,3 +325,4 @@ function updateHeatmapMonth() {
   loadHeatmapData();
 }
 updateHeatmapMonth();
+initForm();
