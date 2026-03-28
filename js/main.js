@@ -8,6 +8,7 @@ import {
   renderEntries,
   initEntries,
 } from "./features/entries.js";
+import { initModal, openEntryModal } from "./features/modal.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -38,6 +39,11 @@ export async function loadEntries() {
 }
 
 initEntries({
+  onOpenModal(entry) {
+    openEntryModal(entry);
+  },
+});
+initModal({
   onEdit(entry) {
     switchToTab("today");
     startEditingEntry(entry);

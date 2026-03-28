@@ -1,27 +1,8 @@
-let selectedEntry = null;
-
 const entriesList = document.getElementById("entries-list");
-const emptyStateMessage = document.getElementById("empty-state-message");
 const entriesLoading = document.getElementById("entries-loading");
-const entryDetailsModal = document.getElementById("entry-details-modal");
-const closeEntryModal = document.getElementById("close-entry-modal");
-const deleteEntryButton = document.getElementById("delete-entry-btn");
-const modalDate = document.getElementById("modal-date");
-const modalHours = document.getElementById("modal-hours");
-const modalIntensity = document.getElementById("modal-intensity");
-const modalChallenge = document.getElementById("modal-challenge");
-const modalNote = document.getElementById("modal-note");
-const editBtn = document.getElementById("edit-entry-btn");
-// OPEN ENTRY MODAL
-export function openEntryModal(entry) {
-  selectedEntry = entry;
-  modalDate.value = entry.date;
-  modalHours.value = entry.hours;
-  modalIntensity.value = entry.intensity;
-  modalChallenge.value = entry.challenge;
-  modalNote.value = entry.note || "";
-  entryDetailsModal.style.display = "flex";
-}
+const emptyStateMessage = document.getElementById("empty-state-message");
+let renderedEntries = [];
+
 // SHOW ENTRIES
 export function showEntriesLoading() {
   entriesLoading.style.display = "flex";
@@ -47,11 +28,11 @@ export function renderEntries(entries) {
     emptyStateMessage.style.display = "none";
     entriesList.style.display = "flex";
   }
-  const sortedEntries = [...entries].sort(
+  renderedEntries = [...entries].sort(
     (a, b) => new Date(b.date) - new Date(a.date),
   );
 
-  entriesList.innerHTML = sortedEntries
+  entriesList.innerHTML = renderedEntries
     .map((entry) => {
       const date = new Date(entry.date);
       const day = date.getDate();
@@ -81,44 +62,22 @@ export function renderEntries(entries) {
   `;
     })
     .join("");
+}
+// INIT ENTRIES
+export function initEntries({ onOpenModal }) {
+  entriesList.addEventListener("click", function (event) {
+    const card = event.target.closest(".entry-card");
+    if (!card) return;
 
-  const cards = document.querySelectorAll(".entry-card");
-  cards.forEach(function (card) {
-    card.addEventListener("click", function () {
-      const data = card.getAttribute("data-id");
-      const data_id = sortedEntries.find((entry) => entry._id === data);
-      openEntryModal(data_id);
+    const entryId = card.getAttribute("data-id");
+    const entry = renderedEntries.find(function (item) {
+      return item._id === entryId;
     });
-  });
-}
-//CLOSE MODAL
-function closeModal() {
-  entryDetailsModal.style.display = "none";
-}
-export function initEntries({ onEdit, onDelete }) {
-  closeEntryModal.addEventListener("click", function () {
-    closeModal();
-  });
 
-  editBtn.addEventListener("click", function () {
-    if (!selectedEntry) return;
+    if (!entry) return;
 
-    closeModal();
-
-    if (onEdit) {
-      onEdit(selectedEntry);
-    }
-  });
-
-  deleteEntryButton.addEventListener("click", function () {
-    if (!selectedEntry) return;
-
-    const confirmed = confirm("Are you sure you want to delete this entry?");
-    if (!confirmed) return;
-
-    if (onDelete) {
-      onDelete(selectedEntry);
-      closeModal();
+    if (onOpenModal) {
+      onOpenModal(entry);
     }
   });
 }
