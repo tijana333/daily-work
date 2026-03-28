@@ -9,6 +9,7 @@ import {
   validateHours,
   validateChallenge,
 } from "../utils/validators.js";
+import { state } from "../state/state.js";
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
@@ -26,8 +27,6 @@ const dateError = document.getElementById("date-error");
 const hoursError = document.getElementById("hours-error");
 const challengeError = document.getElementById("challenge-error");
 const buttons = document.querySelectorAll(".intensity-button");
-let editingEntryId = null;
-let intensity = 1;
 
 const todayDate = new Date().toISOString().substring(0, 10);
 const originalSubmitButtonText = submitBtnText.textContent;

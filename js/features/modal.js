@@ -1,5 +1,4 @@
-
-let selectedEntry = null;
+import { state } from "../state/state.js";
 
 const entryDetailsModal = document.getElementById("entry-details-modal");
 const closeEntryModalButton = document.getElementById("close-entry-modal");
