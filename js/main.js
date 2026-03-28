@@ -1,64 +1,25 @@
 import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
 import { startEditingEntry, initForm } from "./features/form.js";
-import { initTabs } from "./features/tabs.js";
+import { initTabs, switchToTab } from "./features/tabs.js";
+import {
+  showEntriesLoading,
+  hideEntriesLoading,
+  showEntriesError,
+  renderEntries,
+  initEntries,
+} from "./features/entries.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
 ===========================================*/
 const API_URL = "https://daily-work-backend.vercel.app/api/entries";
-/* ========================================
-TAB NAVIGATION
-Handles switching between tabs and Loading
-entries when the entries tab is opened
-===========================================*/
-
-const entriesList = document.getElementById("entries-list");
-const emptyStateMessage = document.getElementById("empty-state-message");
-const entriesLoading = document.getElementById("entries-loading");
-const entryDetailsModal = document.getElementById("entry-details-modal");
-const closeEntryModal = document.getElementById("close-entry-modal");
-const deleteEntryButton = document.getElementById("delete-entry-btn");
-const modalDate = document.getElementById("modal-date");
-const modalHours = document.getElementById("modal-hours");
-const modalIntensity = document.getElementById("modal-intensity");
-const modalChallenge = document.getElementById("modal-challenge");
-const modalNote = document.getElementById("modal-note");
-const editBtn = document.getElementById("edit-entry-btn");
-const tabs = document.querySelectorAll(".tab");
-editBtn.addEventListener("click", function () {
-  entryDetailsModal.style.display = "none";
-  tabs.forEach(function (tbs) {
-    tbs.classList.remove("active");
-  });
-  const dataTab = document.querySelector(`[data-tab="today"]`);
-  dataTab.classList.add("active");
-  const content = document.querySelectorAll(".tab-content");
-  content.forEach((c) => c.classList.remove("active"));
-  const todaySection = document.getElementById("today-section");
-  todaySection.classList.add("active");
-  startEditingEntry(selectedEntry);
-});
-
-let selectedEntry = null;
-
-function openEntryModal(entry) {
-  selectedEntry = entry;
-  modalDate.value = entry.date;
-  modalHours.value = entry.hours;
-  modalIntensity.value = entry.intensity;
-  modalChallenge.value = entry.challenge;
-  modalNote.value = entry.note || "";
-  entryDetailsModal.style.display = "flex";
-}
 
 /* ========================================
     ENTRIES LOADING
     Fetch and render all entries
 ===========================================*/
 export async function loadEntries() {
-  entriesLoading.style.display = "flex";
-  entriesList.style.display = "none";
-  emptyStateMessage.style.display = "none";
+  showEntriesLoading();
   let url = API_URL;
   try {
     if (currentView === "month") {
@@ -68,74 +29,29 @@ export async function loadEntries() {
       url = API_URL + "?month=" + month + "&year=" + year;
     }
     const result = await loadEntriesApi(url);
-    entriesLoading.style.display = "none";
-    const data = result.data;
-    const entries = data.data;
-    if (entries.length === 0) {
-      emptyStateMessage.style.display = "block";
-      entriesList.style.display = "none";
-    } else {
-      emptyStateMessage.style.display = "none";
-      entriesList.style.display = "flex";
-    }
-    entries.sort((a, b) => new Date(b.date) - new Date(a.date));
-    entriesList.innerHTML = entries
-      .map((entry) => {
-        const date = new Date(entry.date);
-        const day = date.getDate();
-        const monthYear = date.toLocaleString("default", {
-          month: "short",
-          year: "numeric",
-        });
-
-        return `
-    <div class="entry-card" data-id="${entry._id}">
-      
-      <div class="entry-date">
-        <span class="day">${day}</span>
-        <span class="month">${monthYear}</span>
-      </div>
-
-      <div class="entry-content">
-        <div class="hours">${entry.hours} hours</div>
-        <div class="challenge">${entry.challenge}</div>
-      </div>
-
-      <div class="entry-intensity">
-        ${entry.intensity}
-      </div>
-
-    </div>
-  `;
-      })
-      .join("");
-
-    const cards = document.querySelectorAll(".entry-card");
-    cards.forEach(function (card) {
-      card.addEventListener("click", function (element) {
-        const data = card.getAttribute("data-id");
-        const data_id = entries.find((entry) => entry._id === data);
-        openEntryModal(data_id);
-      });
-    });
+    const entries = result.data.data;
+    hideEntriesLoading();
+    renderEntries(entries);
   } catch (error) {
-    entriesLoading.style.display = "none";
-    entriesList.textContent = "Something went wrong!";
+    showEntriesError();
   }
 }
-closeEntryModal.addEventListener("click", function (element) {
-  entryDetailsModal.style.display = "none";
-});
-deleteEntryButton.addEventListener("click", async function () {
-  if (confirm("Are you sure you want to delete this entry?")) {
-    await fetch(API_URL + "/" + selectedEntry._id, {
+
+initEntries({
+  onEdit(entry) {
+    switchToTab("today");
+    startEditingEntry(entry);
+  },
+  async onDelete(entry) {
+    await fetch(API_URL + "/" + entry._id, {
       method: "DELETE",
     });
-    entryDetailsModal.style.display = "none";
-    loadEntries();
+    await loadEntries();
     alert("Entry deleted successfully");
-  }
+  },
 });
+initForm();
+initTabs();
 
 /* ===== MONTH CAROUSEL ===== */
 
@@ -308,5 +224,3 @@ function updateHeatmapMonth() {
   loadHeatmapData();
 }
 updateHeatmapMonth();
-initForm();
-initTabs();

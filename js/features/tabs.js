@@ -21,3 +21,16 @@ export function initTabs() {
     });
   });
 }
+
+export function switchToTab(name) {
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach((t) => t.classList.remove("active"));
+
+  const targetTab = document.querySelector(`[data-tab="${name}"]`);
+  targetTab.classList.add("active");
+
+  const content = document.querySelectorAll(".tab-content");
+  content.forEach((c) => c.classList.remove("active"));
+
+  document.getElementById(name + "-section").classList.add("active");
+}
