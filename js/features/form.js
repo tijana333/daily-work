@@ -77,9 +77,9 @@ async function submitEntry(entry) {
     if (result.status === 201) {
       form.reset();
       dateElement.value = todayDate;
-      editingEntryId = null;
+      state.editingEntryId = null;
       submitBtnText.textContent = "Save Entry";
-      intensity = 1;
+      state.intensity = 1;
       successMsg.style.display = "block";
       serverError.style.display = "none";
       buttons.forEach(function (button) {
@@ -101,14 +101,14 @@ async function submitEntry(entry) {
 }
 // START EDITING ENTRY
 export function startEditingEntry(entry) {
-  editingEntryId = entry._id;
+  state.editingEntryId = entry._id;
   submitBtnText.textContent = "Update Entry";
 
   dateElement.value = entry.date;
   hoursElement.value = entry.hours;
   challengeElement.value = entry.challenge;
   noteElement.value = entry.note || "";
-  intensity = entry.intensity;
+  state.intensity = entry.intensity;
 
   buttons.forEach(function (intensityButton) {
     intensityButton.classList.remove("active");
@@ -120,31 +120,29 @@ export function startEditingEntry(entry) {
 }
 // LOAD ENTRY BY DATE
 async function loadEntryByDate(selectedDate) {
-  console.log("Selected date:", selectedDate);
   const result = await loadEntryByDateApi(selectedDate);
   console.log(result);
 
   if (result.status === 404) {
-    editingEntryId = null;
+    state.editingEntryId = null;
     submitBtnText.textContent = "Save Entry";
     return;
   }
   const data = result.data;
   if (!data.data[0]) {
-    editingEntryId = null;
+    state.editingEntryId = null;
     submitBtnText.textContent = "Save Entry";
     return;
   }
   const entry = data.data[0];
   if (data.data[0]) {
-    editingEntryId = entry._id;
-    console.log("SET ID:", editingEntryId);
+    state.editingEntryId = entry._id;
     submitBtnText.textContent = "Update Entry";
   }
-  console.log("ENTRY:", entry);
   hoursElement.value = entry.hours || "";
   challengeElement.value = entry.challenge;
   noteElement.value = entry.note || "";
+  state.intensity = entry.intensity;
 
   buttons.forEach(function (button) {
     button.classList.remove("active");
@@ -204,12 +202,12 @@ form.addEventListener("submit", function (event) {
   const entry = {
     date: dateElement.value,
     hours: Number(hoursElement.value),
-    intensity: intensity,
+    intensity: state.intensity,
     challenge: challengeElement.value.trim(),
     note: noteValue,
   };
-  if (editingEntryId) {
-    updateEntry(editingEntryId, entry);
+  if (state.editingEntryId) {
+    updateEntry(state.editingEntryId, entry);
   } else {
     submitEntry(entry);
   }
@@ -231,7 +229,7 @@ buttons.forEach(function (button) {
     button.classList.add("active");
     const numberSpan = button.querySelector(".tab-number");
     const buttonValue = numberSpan.textContent;
-    intensity = Number(buttonValue);
+    state.intensity = Number(buttonValue);
   });
 });
 // INIT FORM

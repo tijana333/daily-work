@@ -14,7 +14,7 @@ let onEditHandler = null;
 let onDeleteHandler = null;
 
 export function openEntryModal(entry) {
-  selectedEntry = entry;
+  state.selectedEntry = entry;
 
   modalDate.value = entry.date;
   modalHours.value = entry.hours;
@@ -27,7 +27,7 @@ export function openEntryModal(entry) {
 
 export function closeEntryModal() {
   entryDetailsModal.style.display = "none";
-  selectedEntry = null;
+  state.selectedEntry = null;
 }
 
 export function initModal({ onEdit, onDelete }) {
@@ -39,23 +39,23 @@ export function initModal({ onEdit, onDelete }) {
   });
 
   editBtn.addEventListener("click", function () {
-    if (!selectedEntry) return;
+    if (!state.selectedEntry) return;
 
     if (onEditHandler) {
-      onEditHandler(selectedEntry);
+      onEditHandler(state.selectedEntry);
     }
 
     closeEntryModal();
   });
 
   deleteEntryButton.addEventListener("click", async function () {
-    if (!selectedEntry) return;
+    if (!state.selectedEntry) return;
 
     const confirmed = confirm("Are you sure you want to delete this entry?");
     if (!confirmed) return;
 
     if (onDeleteHandler) {
-      await onDeleteHandler(selectedEntry);
+      await onDeleteHandler(state.selectedEntry);
     }
 
     closeEntryModal();
