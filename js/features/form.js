@@ -1,7 +1,6 @@
 import {
   submitEntry as submitEntryApi,
   updateEntry as updateEntryApi,
-  loadEntryByDate as loadEntryByDateApi,
 } from "../api/entriesApi.js";
 
 import {
@@ -61,20 +60,18 @@ function setLoading(isLoading) {
 }
 async function updateEntry(id, entry) {
   setLoading(true);
+
   try {
     const result = await updateEntryApi(id, entry);
 
     if (result.status === 200) {
       showTimedMessage(successMsg, "Entry updated successfully!");
-      showTimedMessage(successMsg, "Entry updated successfully!");
-      serverError.style.display = "none";
-    }
-    if (onSuccessHandler) {
-      await onSuccessHandler();
+
+      if (onSuccessHandler) {
+        await onSuccessHandler();
+      }
     } else {
-      serverError.textContent = "Update failed!";
-      serverError.style.display = "block";
-      showTimedMessage(successMsg, "Entry updated successfully!");
+      showTimedMessage(serverError, "Update failed!");
     }
   } catch (error) {
     showTimedMessage(serverError, "Update failed!");
@@ -86,25 +83,22 @@ async function updateEntry(id, entry) {
 // SUBMIT ENTRY
 async function submitEntry(entry) {
   setLoading(true);
+
   try {
     const result = await submitEntryApi(entry);
+
     if (result.status === 409) {
-      serverError.textContent = "Entry for this date already exists";
-      serverError.style.display = "block";
-      showTimedMessage(successMsg, "Entry updated successfully!");
+      showTimedMessage(serverError, "Entry for this date already exists");
       return;
     }
+
     if (result.status === 201) {
       form.reset();
       dateElement.value = todayDate;
       state.editingEntryId = null;
       submitBtnText.textContent = "Save Entry";
       state.intensity = 1;
-      showTimedMessage(successMsg, "Entry updated successfully!");
-      serverError.style.display = "none";
-      if (onSuccessHandler) {
-        await onSuccessHandler();
-      }
+
       buttons.forEach(function (button) {
         const numberSpan = button.querySelector(".tab-number");
         const spanValue = numberSpan.textContent;
@@ -113,11 +107,17 @@ async function submitEntry(entry) {
           button.classList.add("active");
         }
       });
+
+      showTimedMessage(successMsg, "Entry created successfully!");
+
+      if (onSuccessHandler) {
+        await onSuccessHandler();
+      }
     } else {
-      serverError.textContent = "Please check your input and try again.";
-      serverError.style.display = "block";
-      showTimedMessage(successMsg, "Entry updated successfully!");
+      showTimedMessage(serverError, "Please check your input and try again.");
     }
+  } catch (error) {
+    showTimedMessage(serverError, "Failed to save entry.");
   } finally {
     setLoading(false);
   }
@@ -141,45 +141,42 @@ export function startEditingEntry(entry) {
     }
   });
 }
-// LOAD ENTRY BY DATE
-async function loadEntryByDate(selectedDate) {
-  const result = await loadEntryByDateApi(selectedDate);
-  console.log(result);
+// // LOAD ENTRY BY DATE
+// async function loadEntryByDate(selectedDate) {
+//   const result = await loadEntryByDateApi(selectedDate);
+//   console.log(result);
 
-  if (result.status === 404) {
-    state.editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const data = result.data;
-  if (!data.data[0]) {
-    state.editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const entry = data.data[0];
-  if (data.data[0]) {
-    state.editingEntryId = entry._id;
-    submitBtnText.textContent = "Update Entry";
-  }
-  hoursElement.value = entry.hours || "";
-  challengeElement.value = entry.challenge;
-  noteElement.value = entry.note || "";
-  state.intensity = entry.intensity;
+//   if (result.status === 404) {
+//     state.editingEntryId = null;
+//     submitBtnText.textContent = "Save Entry";
+//     return;
+//   }
+//   const data = result.data;
+//   if (!data.data[0]) {
+//     state.editingEntryId = null;
+//     submitBtnText.textContent = "Save Entry";
+//     return;
+//   }
+//   const entry = data.data[0];
+//   if (data.data[0]) {
+//     state.editingEntryId = entry._id;
+//     submitBtnText.textContent = "Update Entry";
+//   }
+//   hoursElement.value = entry.hours || "";
+//   challengeElement.value = entry.challenge;
+//   noteElement.value = entry.note || "";
+//   state.intensity = entry.intensity;
 
-  buttons.forEach(function (button) {
-    button.classList.remove("active");
-    const numberSpan = button.querySelector(".tab-number");
-    if (numberSpan.textContent == entry.intensity) {
-      button.classList.add("active");
-    }
-  });
-}
+//   buttons.forEach(function (button) {
+//     button.classList.remove("active");
+//     const numberSpan = button.querySelector(".tab-number");
+//     if (numberSpan.textContent == entry.intensity) {
+//       button.classList.add("active");
+//     }
+//   });
+// }
 dateElement.addEventListener("change", function () {
-  const isValid = validateDate(dateElement, dateError, todayDate);
-  if (isValid === true) {
-    loadEntryByDate(dateElement.value);
-  }
+  validateDate(dateElement, dateError, todayDate);
 });
 hoursElement.addEventListener("input", function () {
   validateHours(hoursElement, hoursError);
