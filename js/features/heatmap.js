@@ -1,3 +1,5 @@
+let refreshHeatmapData = null;
+
 export function initHeatmap({ apiUrl }) {
   const currentMonthElement = document.getElementById("current-month");
   const previousMonthButton = document.getElementById("prev-month");
@@ -11,7 +13,6 @@ export function initHeatmap({ apiUrl }) {
   const totalHours = document.getElementById("total-hours");
   const daysLogged = document.getElementById("days-logged");
   const avgIntensity = document.getElementById("avg-intensity");
-
   let activeMonth = new Date();
   let startX = 0;
   let endX = 0;
@@ -133,6 +134,7 @@ export function initHeatmap({ apiUrl }) {
       avgIntensity.textContent = "0.0";
       console.error("Failed to load heatmap data:", error);
     }
+    refreshHeatmapData = updateHeatmapMonth;
   }
   // UPDATE HEATMAP MONTH
   function updateHeatmapMonth() {
@@ -142,12 +144,20 @@ export function initHeatmap({ apiUrl }) {
   }
 
   previousMonthButton.addEventListener("click", function () {
-    activeMonth.setMonth(activeMonth.getMonth() - 1);
+    activeMonth = new Date(
+      activeMonth.getFullYear(),
+      activeMonth.getMonth() - 1,
+      1,
+    );
     updateHeatmapMonth();
   });
 
   nextMonthButton.addEventListener("click", function () {
-    activeMonth.setMonth(activeMonth.getMonth() + 1);
+    activeMonth = new Date(
+      activeMonth.getFullYear(),
+      activeMonth.getMonth() + 1,
+      1,
+    );
     updateHeatmapMonth();
   });
 
@@ -166,15 +176,28 @@ export function initHeatmap({ apiUrl }) {
     if (Math.abs(deltaX) < swipeThreshold) return;
 
     if (deltaX < 0) {
-      activeMonth.setMonth(activeMonth.getMonth() + 1);
+      activeMonth = new Date(
+        activeMonth.getFullYear(),
+        activeMonth.getMonth() + 1,
+        1,
+      );
       updateHeatmapMonth();
     }
 
     if (deltaX > 0) {
-      activeMonth.setMonth(activeMonth.getMonth() - 1);
+      activeMonth = new Date(
+        activeMonth.getFullYear(),
+        activeMonth.getMonth() - 1,
+        1,
+      );
       updateHeatmapMonth();
     }
   });
 
   updateHeatmapMonth();
+}
+export function refreshHeatmap() {
+  if (refreshHeatmapData) {
+    refreshHeatmapData();
+  }
 }

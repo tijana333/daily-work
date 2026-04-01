@@ -9,7 +9,7 @@ export function validateDate(input, errorElement, todayDate) {
   }
 
   if (value > todayDate) {
-    errorElement.textContent = "Date cannot be in the future";
+    errorElement.textContent = "Future date is not allowed";
     errorElement.classList.add("show");
     input.classList.add("error");
     return false;
@@ -33,6 +33,12 @@ export function validateHours(input, errorElement) {
 
   if (Number.isNaN(value) || value <= 0) {
     errorElement.textContent = "Hours must be greater than 0";
+    errorElement.classList.add("show");
+    input.classList.add("error");
+    return false;
+  }
+  if (value > 24) {
+    errorElement.textContent = "Hours cannot be greater than 24";
     errorElement.classList.add("show");
     input.classList.add("error");
     return false;

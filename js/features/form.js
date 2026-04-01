@@ -27,17 +27,36 @@ const dateError = document.getElementById("date-error");
 const hoursError = document.getElementById("hours-error");
 const challengeError = document.getElementById("challenge-error");
 const buttons = document.querySelectorAll(".intensity-button");
+let messageTimer;
 
 const todayDate = new Date().toISOString().substring(0, 10);
 const originalSubmitButtonText = submitBtnText.textContent;
+let onSuccessHandler = null;
+//TIMER
+
+function showTimedMessage(element, message) {
+  clearTimeout(messageTimer);
+
+  successMsg.style.display = "none";
+  serverError.style.display = "none";
+
+  element.textContent = message;
+  element.style.display = "block";
+
+  messageTimer = setTimeout(function () {
+    element.style.display = "none";
+  }, 5000);
+}
 // SET LOADING
 function setLoading(isLoading) {
   if (isLoading === true) {
     submitBtnText.textContent = "Saving...";
     submitBtn.disabled = true;
+    submitBtn.classList.add("loading");
   } else {
     submitBtnText.textContent = originalSubmitButtonText;
     submitBtn.disabled = false;
+    submitBtn.classList.remove("loading");
   }
 }
 async function updateEntry(id, entry) {
@@ -46,18 +65,19 @@ async function updateEntry(id, entry) {
     const result = await updateEntryApi(id, entry);
 
     if (result.status === 200) {
-      successMsg.textContent = "Entry updated successfully!";
-      successMsg.style.display = "block";
+      showTimedMessage(successMsg, "Entry updated successfully!");
+      showTimedMessage(successMsg, "Entry updated successfully!");
       serverError.style.display = "none";
+    }
+    if (onSuccessHandler) {
+      await onSuccessHandler();
     } else {
       serverError.textContent = "Update failed!";
       serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(successMsg, "Entry updated successfully!");
     }
   } catch (error) {
-    serverError.textContent = "Update failed!";
-    serverError.style.display = "block";
-    successMsg.style.display = "none";
+    showTimedMessage(serverError, "Update failed!");
   } finally {
     setLoading(false);
   }
@@ -71,7 +91,7 @@ async function submitEntry(entry) {
     if (result.status === 409) {
       serverError.textContent = "Entry for this date already exists";
       serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(successMsg, "Entry updated successfully!");
       return;
     }
     if (result.status === 201) {
@@ -80,8 +100,11 @@ async function submitEntry(entry) {
       state.editingEntryId = null;
       submitBtnText.textContent = "Save Entry";
       state.intensity = 1;
-      successMsg.style.display = "block";
+      showTimedMessage(successMsg, "Entry updated successfully!");
       serverError.style.display = "none";
+      if (onSuccessHandler) {
+        await onSuccessHandler();
+      }
       buttons.forEach(function (button) {
         const numberSpan = button.querySelector(".tab-number");
         const spanValue = numberSpan.textContent;
@@ -91,9 +114,9 @@ async function submitEntry(entry) {
         }
       });
     } else {
-      serverError.textContent = "Something went wrong!";
+      serverError.textContent = "Please check your input and try again.";
       serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(successMsg, "Entry updated successfully!");
     }
   } finally {
     setLoading(false);
@@ -202,7 +225,7 @@ form.addEventListener("submit", function (event) {
   const entry = {
     date: dateElement.value,
     hours: Number(hoursElement.value),
-    intensity: state.intensity,
+    intensity: state.intensity || 1,
     challenge: challengeElement.value.trim(),
     note: noteValue,
   };
@@ -233,7 +256,8 @@ buttons.forEach(function (button) {
   });
 });
 // INIT FORM
-export function initForm() {
+export function initForm({ onSuccess } = {}) {
+  onSuccessHandler = onSuccess;
   dateElement.value = todayDate;
   dateElement.max = todayDate;
 }

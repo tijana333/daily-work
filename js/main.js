@@ -9,7 +9,7 @@ import {
   initEntries,
 } from "./features/entries.js";
 import { initModal, openEntryModal } from "./features/modal.js";
-import { initHeatmap } from "./features/heatmap.js";
+import { initHeatmap, refreshHeatmap } from "./features/heatmap.js";
 import { state } from "./state/state.js";
 
 /* ========================================
@@ -54,14 +54,27 @@ initModal({
     startEditingEntry(entry);
   },
   async onDelete(entry) {
-    await fetch(API_URL + "/" + entry._id, {
+    const response = await fetch(API_URL + "/" + entry._id, {
       method: "DELETE",
     });
+
+    if (!response.ok) {
+      throw new Error("Delete failed");
+    }
+
     await loadEntries();
-    alert("Entry deleted successfully");
+    refreshHeatmap();
   },
 });
-initForm();
+initForm({
+  async onSuccess() {
+    await loadEntries();
+    refreshHeatmap();
+  },
+});
+initTabs();
+initHeatmap({ apiUrl: API_URL });
+loadEntries();
 initTabs();
 initHeatmap({ apiUrl: API_URL });
 loadEntries();

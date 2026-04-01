@@ -54,10 +54,14 @@ export function initModal({ onEdit, onDelete }) {
     const confirmed = confirm("Are you sure you want to delete this entry?");
     if (!confirmed) return;
 
-    if (onDeleteHandler) {
-      await onDeleteHandler(state.selectedEntry);
-    }
+    try {
+      if (onDeleteHandler) {
+        await onDeleteHandler(state.selectedEntry);
+      }
 
-    closeEntryModal();
+      closeEntryModal();
+    } catch (error) {
+      alert("Failed to delete entry.");
+    }
   });
 }
