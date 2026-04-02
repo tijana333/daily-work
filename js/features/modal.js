@@ -9,6 +9,9 @@ const modalIntensity = document.getElementById("modal-intensity");
 const modalChallenge = document.getElementById("modal-challenge");
 const modalNote = document.getElementById("modal-note");
 const editBtn = document.getElementById("edit-entry-btn");
+const deleteConfirmModal = document.getElementById("delete-confirm-modal");
+const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 
 let onEditHandler = null;
 let onDeleteHandler = null;
@@ -48,17 +51,25 @@ export function initModal({ onEdit, onDelete }) {
     closeEntryModal();
   });
 
-  deleteEntryButton.addEventListener("click", async function () {
+  deleteEntryButton.addEventListener("click", function () {
     if (!state.selectedEntry) return;
 
-    const confirmed = confirm("Are you sure you want to delete this entry?");
-    if (!confirmed) return;
+    deleteConfirmModal.style.display = "flex";
+  });
+
+  cancelDeleteBtn.addEventListener("click", function () {
+    deleteConfirmModal.style.display = "none";
+  });
+
+  confirmDeleteBtn.addEventListener("click", async function () {
+    if (!state.selectedEntry) return;
 
     try {
       if (onDeleteHandler) {
         await onDeleteHandler(state.selectedEntry);
       }
 
+      deleteConfirmModal.style.display = "none";
       closeEntryModal();
     } catch (error) {
       alert("Failed to delete entry.");
