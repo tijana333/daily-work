@@ -1,7 +1,6 @@
 import {
   submitEntry as submitEntryApi,
   updateEntry as updateEntryApi,
-  loadEntryByDate as loadEntryByDateApi,
 } from "../api/entriesApi.js";
 
 import {
@@ -9,6 +8,7 @@ import {
   validateHours,
   validateChallenge,
 } from "../utils/validators.js";
+import { state } from "../state/state.js";
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
@@ -26,39 +26,55 @@ const dateError = document.getElementById("date-error");
 const hoursError = document.getElementById("hours-error");
 const challengeError = document.getElementById("challenge-error");
 const buttons = document.querySelectorAll(".intensity-button");
-let editingEntryId = null;
-let intensity = 1;
+let messageTimer;
 
 const todayDate = new Date().toISOString().substring(0, 10);
 const originalSubmitButtonText = submitBtnText.textContent;
+let onSuccessHandler = null;
+//TIMER
+
+function showTimedMessage(element, message) {
+  clearTimeout(messageTimer);
+
+  successMsg.style.display = "none";
+  serverError.style.display = "none";
+
+  element.textContent = message;
+  element.style.display = "block";
+
+  messageTimer = setTimeout(function () {
+    element.style.display = "none";
+  }, 5000);
+}
 // SET LOADING
 function setLoading(isLoading) {
   if (isLoading === true) {
     submitBtnText.textContent = "Saving...";
     submitBtn.disabled = true;
+    submitBtn.classList.add("loading");
   } else {
     submitBtnText.textContent = originalSubmitButtonText;
     submitBtn.disabled = false;
+    submitBtn.classList.remove("loading");
   }
 }
 async function updateEntry(id, entry) {
   setLoading(true);
+
   try {
     const result = await updateEntryApi(id, entry);
 
     if (result.status === 200) {
-      successMsg.textContent = "Entry updated successfully!";
-      successMsg.style.display = "block";
-      serverError.style.display = "none";
+      showTimedMessage(successMsg, "Entry updated successfully!");
+
+      if (onSuccessHandler) {
+        await onSuccessHandler();
+      }
     } else {
-      serverError.textContent = "Update failed!";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(serverError, "Update failed!");
     }
   } catch (error) {
-    serverError.textContent = "Update failed!";
-    serverError.style.display = "block";
-    successMsg.style.display = "none";
+    showTimedMessage(serverError, "Update failed!");
   } finally {
     setLoading(false);
   }
@@ -67,22 +83,22 @@ async function updateEntry(id, entry) {
 // SUBMIT ENTRY
 async function submitEntry(entry) {
   setLoading(true);
+
   try {
     const result = await submitEntryApi(entry);
+
     if (result.status === 409) {
-      serverError.textContent = "Entry for this date already exists";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(serverError, "Entry for this date already exists");
       return;
     }
+
     if (result.status === 201) {
       form.reset();
       dateElement.value = todayDate;
-      editingEntryId = null;
+      state.editingEntryId = null;
       submitBtnText.textContent = "Save Entry";
-      intensity = 1;
-      successMsg.style.display = "block";
-      serverError.style.display = "none";
+      state.intensity = 1;
+
       buttons.forEach(function (button) {
         const numberSpan = button.querySelector(".tab-number");
         const spanValue = numberSpan.textContent;
@@ -91,25 +107,31 @@ async function submitEntry(entry) {
           button.classList.add("active");
         }
       });
+
+      showTimedMessage(successMsg, "Entry created successfully!");
+
+      if (onSuccessHandler) {
+        await onSuccessHandler();
+      }
     } else {
-      serverError.textContent = "Something went wrong!";
-      serverError.style.display = "block";
-      successMsg.style.display = "none";
+      showTimedMessage(serverError, "Please check your input and try again.");
     }
+  } catch (error) {
+    showTimedMessage(serverError, "Failed to save entry.");
   } finally {
     setLoading(false);
   }
 }
 // START EDITING ENTRY
 export function startEditingEntry(entry) {
-  editingEntryId = entry._id;
+  state.editingEntryId = entry._id;
   submitBtnText.textContent = "Update Entry";
 
   dateElement.value = entry.date;
   hoursElement.value = entry.hours;
   challengeElement.value = entry.challenge;
   noteElement.value = entry.note || "";
-  intensity = entry.intensity;
+  state.intensity = entry.intensity;
 
   buttons.forEach(function (intensityButton) {
     intensityButton.classList.remove("active");
@@ -119,47 +141,42 @@ export function startEditingEntry(entry) {
     }
   });
 }
-// LOAD ENTRY BY DATE
-async function loadEntryByDate(selectedDate) {
-  console.log("Selected date:", selectedDate);
-  const result = await loadEntryByDateApi(selectedDate);
-  console.log(result);
+// // LOAD ENTRY BY DATE
+// async function loadEntryByDate(selectedDate) {
+//   const result = await loadEntryByDateApi(selectedDate);
+//   console.log(result);
 
-  if (result.status === 404) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const data = result.data;
-  if (!data.data[0]) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const entry = data.data[0];
-  if (data.data[0]) {
-    editingEntryId = entry._id;
-    console.log("SET ID:", editingEntryId);
-    submitBtnText.textContent = "Update Entry";
-  }
-  console.log("ENTRY:", entry);
-  hoursElement.value = entry.hours || "";
-  challengeElement.value = entry.challenge;
-  noteElement.value = entry.note || "";
+//   if (result.status === 404) {
+//     state.editingEntryId = null;
+//     submitBtnText.textContent = "Save Entry";
+//     return;
+//   }
+//   const data = result.data;
+//   if (!data.data[0]) {
+//     state.editingEntryId = null;
+//     submitBtnText.textContent = "Save Entry";
+//     return;
+//   }
+//   const entry = data.data[0];
+//   if (data.data[0]) {
+//     state.editingEntryId = entry._id;
+//     submitBtnText.textContent = "Update Entry";
+//   }
+//   hoursElement.value = entry.hours || "";
+//   challengeElement.value = entry.challenge;
+//   noteElement.value = entry.note || "";
+//   state.intensity = entry.intensity;
 
-  buttons.forEach(function (button) {
-    button.classList.remove("active");
-    const numberSpan = button.querySelector(".tab-number");
-    if (numberSpan.textContent == entry.intensity) {
-      button.classList.add("active");
-    }
-  });
-}
+//   buttons.forEach(function (button) {
+//     button.classList.remove("active");
+//     const numberSpan = button.querySelector(".tab-number");
+//     if (numberSpan.textContent == entry.intensity) {
+//       button.classList.add("active");
+//     }
+//   });
+// }
 dateElement.addEventListener("change", function () {
-  const isValid = validateDate(dateElement, dateError, todayDate);
-  if (isValid === true) {
-    loadEntryByDate(dateElement.value);
-  }
+  validateDate(dateElement, dateError, todayDate);
 });
 hoursElement.addEventListener("input", function () {
   validateHours(hoursElement, hoursError);
@@ -205,12 +222,12 @@ form.addEventListener("submit", function (event) {
   const entry = {
     date: dateElement.value,
     hours: Number(hoursElement.value),
-    intensity: intensity,
+    intensity: state.intensity || 1,
     challenge: challengeElement.value.trim(),
     note: noteValue,
   };
-  if (editingEntryId) {
-    updateEntry(editingEntryId, entry);
+  if (state.editingEntryId) {
+    updateEntry(state.editingEntryId, entry);
   } else {
     submitEntry(entry);
   }
@@ -232,11 +249,12 @@ buttons.forEach(function (button) {
     button.classList.add("active");
     const numberSpan = button.querySelector(".tab-number");
     const buttonValue = numberSpan.textContent;
-    intensity = Number(buttonValue);
+    state.intensity = Number(buttonValue);
   });
 });
 // INIT FORM
-export function initForm() {
+export function initForm({ onSuccess } = {}) {
+  onSuccessHandler = onSuccess;
   dateElement.value = todayDate;
   dateElement.max = todayDate;
 }

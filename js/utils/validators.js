@@ -1,62 +1,74 @@
-export function validateDate(dateElement, dateError, todayDate) {
-  const dateValue = dateElement.value;
-  dateError.classList.remove("show");
-  dateElement.classList.remove("error");
+export function validateDate(input, errorElement, todayDate) {
+  const value = input.value;
 
-  if (dateValue.length == 0) {
-    dateError.textContent = "Select date!";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
-    return false;
-  } else if (dateValue > todayDate) {
-    dateError.textContent = "Date cannot be in the future";
-    dateError.classList.add("show");
-    dateElement.classList.add("error");
+  if (!value) {
+    errorElement.textContent = "Date is required";
+    errorElement.classList.add("show");
+    input.classList.add("error");
     return false;
   }
+
+  if (value > todayDate) {
+    errorElement.textContent = "Future date is not allowed";
+    errorElement.classList.add("show");
+    input.classList.add("error");
+    return false;
+  }
+
+  errorElement.textContent = "";
+  errorElement.classList.remove("show");
+  input.classList.remove("error");
   return true;
 }
 
-export function validateHours(hoursElement, hoursError) {
-  const hoursValue = Number(hoursElement.value);
-  hoursError.textContent = "";
-  hoursError.classList.remove("show");
-  hoursElement.classList.remove("error");
+export function validateHours(input, errorElement) {
+  const value = Number(input.value);
 
-  if (hoursElement.value === "") {
-    hoursError.textContent = "Select hours!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    return false;
-  } else if (isNaN(hoursValue)) {
-    hoursError.textContent = "Hours must be a number!";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
-    return false;
-  } else if (hoursValue < 0 || hoursValue > 24) {
-    hoursError.textContent = "Hours must be between 0 and 24";
-    hoursError.classList.add("show");
-    hoursElement.classList.add("error");
+  if (!input.value.trim()) {
+    errorElement.textContent = "Hours are required";
+    errorElement.classList.add("show");
+    input.classList.add("error");
     return false;
   }
+
+  if (Number.isNaN(value) || value <= 0) {
+    errorElement.textContent = "Hours must be greater than 0";
+    errorElement.classList.add("show");
+    input.classList.add("error");
+    return false;
+  }
+  if (value > 24) {
+    errorElement.textContent = "Hours cannot be greater than 24";
+    errorElement.classList.add("show");
+    input.classList.add("error");
+    return false;
+  }
+
+  errorElement.textContent = "";
+  errorElement.classList.remove("show");
+  input.classList.remove("error");
   return true;
 }
-export function validateChallenge(challengeElement, challengeError) {
-  const challengeValue = challengeElement.value.trim();
-  challengeError.textContent = "";
-  challengeError.classList.remove("show");
-  challengeElement.classList.remove("error");
 
-  if (challengeValue === "") {
-    challengeError.textContent = "Challenge is required";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
-    return false;
-  } else if (challengeValue.length > 100) {
-    challengeError.textContent = "Maximum 100 characters";
-    challengeError.classList.add("show");
-    challengeElement.classList.add("error");
+export function validateChallenge(input, errorElement) {
+  const value = input.value.trim();
+
+  if (!value) {
+    errorElement.textContent = "Challenge is required";
+    errorElement.classList.add("show");
+    input.classList.add("error");
     return false;
   }
+
+  if (value.length < 3) {
+    errorElement.textContent = "Challenge must be at least 3 characters";
+    errorElement.classList.add("show");
+    input.classList.add("error");
+    return false;
+  }
+
+  errorElement.textContent = "";
+  errorElement.classList.remove("show");
+  input.classList.remove("error");
   return true;
 }
