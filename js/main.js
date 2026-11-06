@@ -1,5 +1,6 @@
 import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
 import { startEditingEntry, initForm } from "./features/form.js";
+import { escapeHtml } from "./utils/helpers.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -106,20 +107,20 @@ async function loadEntries() {
         });
 
         return `
-    <div class="entry-card" data-id="${entry._id}">
-      
+    <div class="entry-card" data-id="${escapeHtml(entry._id)}">
+
       <div class="entry-date">
         <span class="day">${day}</span>
         <span class="month">${monthYear}</span>
       </div>
 
       <div class="entry-content">
-        <div class="hours">${entry.hours} hours</div>
-        <div class="challenge">${entry.challenge}</div>
+        <div class="hours">${escapeHtml(entry.hours)} hours</div>
+        <div class="challenge">${escapeHtml(entry.challenge)}</div>
       </div>
 
       <div class="entry-intensity">
-        ${entry.intensity}
+        ${escapeHtml(entry.intensity)}
       </div>
 
     </div>
