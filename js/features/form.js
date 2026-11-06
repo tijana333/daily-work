@@ -9,6 +9,7 @@ import {
   validateHours,
   validateChallenge,
 } from "../utils/validators.js";
+import { toLocalDateString } from "../utils/helpers.js";
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
@@ -29,7 +30,7 @@ const buttons = document.querySelectorAll(".intensity-button");
 let editingEntryId = null;
 let intensity = 1;
 
-const todayDate = new Date().toISOString().substring(0, 10);
+const todayDate = toLocalDateString(new Date());
 const originalSubmitButtonText = submitBtnText.textContent;
 // SET LOADING
 function setLoading(isLoading) {

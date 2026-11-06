@@ -1,6 +1,6 @@
 import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
 import { startEditingEntry, initForm } from "./features/form.js";
-import { escapeHtml } from "./utils/helpers.js";
+import { escapeHtml, parseLocalDate } from "./utils/helpers.js";
 /* ========================================
 CONFIGURATION
 API endpoint used for all entry requests
@@ -96,10 +96,10 @@ async function loadEntries() {
       emptyStateMessage.style.display = "none";
       entriesList.style.display = "flex";
     }
-    entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+    entries.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
     entriesList.innerHTML = entries
       .map((entry) => {
-        const date = new Date(entry.date);
+        const date = parseLocalDate(entry.date);
         const day = date.getDate();
         const monthYear = date.toLocaleString("default", {
           month: "short",
@@ -247,7 +247,7 @@ async function loadHeatmapData() {
     grid.style.display = "grid";
     emptyState.style.display = "none";
     entries.forEach(function (entry) {
-      const day = new Date(entry.date).getDate();
+      const day = parseLocalDate(entry.date).getDate();
       const daySquare = grid.children[day - 1];
       daySquare.classList.add("level-" + entry.intensity);
 
