@@ -80,6 +80,7 @@ async function submitEntry(entry) {
       form.reset();
       dateElement.value = todayDate;
       clearEntryFields();
+      successMsg.textContent = "Entry created successfully!";
       successMsg.style.display = "block";
       serverError.style.display = "none";
     } else {
