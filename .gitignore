@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+
+# Personal notes
+notes/
