@@ -34,11 +34,28 @@ export async function loadEntryByDate(selectedDate) {
     data,
   };
 }
-export async function loadEntries(url) {
+// Without arguments loads all entries,
+// with { month, year } loads only that month (month is 1-12)
+export async function loadEntries({ month, year } = {}) {
+  let url = API_URL;
+  if (month && year) {
+    url = API_URL + "?month=" + month + "&year=" + year;
+  }
   const response = await fetch(url);
   const data = await response.json();
   return {
     status: response.status,
     data,
+  };
+}
+
+export async function deleteEntry(id) {
+  const response = await fetch(API_URL + "/" + id, {
+    method: "DELETE",
+  });
+  // DELETE may return an empty body, so the JSON is not read here
+  return {
+    status: response.status,
+    ok: response.ok,
   };
 }
