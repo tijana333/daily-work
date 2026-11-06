@@ -1,10 +1,9 @@
-import { loadEntries as loadEntriesApi } from "./api/entriesApi.js";
+import {
+  loadEntries as loadEntriesApi,
+  deleteEntry as deleteEntryApi,
+} from "./api/entriesApi.js";
 import { startEditingEntry, initForm } from "./features/form.js";
-/* ========================================
-CONFIGURATION
-API endpoint used for all entry requests
-===========================================*/
-const API_URL = "https://daily-work-backend.vercel.app/api/entries";
+import { escapeHtml, parseLocalDate } from "./utils/helpers.js";
 /* ========================================
 TAB NAVIGATION
 Handles switching between tabs and Loading
@@ -72,22 +71,25 @@ function openEntryModal(entry) {
     ENTRIES LOADING
     Fetch and render all entries
 ===========================================*/
+// Increases on every request; only the latest response is rendered,
+// so a slow older response can't overwrite a newer one
+let entriesRequestId = 0;
+
 async function loadEntries() {
+  const requestId = ++entriesRequestId;
   entriesLoading.style.display = "flex";
   entriesList.style.display = "none";
   emptyStateMessage.style.display = "none";
-  let url = API_URL;
   try {
+    let params = {};
     if (currentView === "month") {
       const date = new Date();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      url = API_URL + "?month=" + month + "&year=" + year;
+      params = { month: date.getMonth() + 1, year: date.getFullYear() };
     }
-    const result = await loadEntriesApi(url);
+    const result = await loadEntriesApi(params);
+    if (requestId !== entriesRequestId) return;
     entriesLoading.style.display = "none";
-    const data = result.data;
-    const entries = data.data;
+    const entries = result.data.data || [];
     if (entries.length === 0) {
       emptyStateMessage.style.display = "block";
       entriesList.style.display = "none";
@@ -95,10 +97,10 @@ async function loadEntries() {
       emptyStateMessage.style.display = "none";
       entriesList.style.display = "flex";
     }
-    entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+    entries.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
     entriesList.innerHTML = entries
       .map((entry) => {
-        const date = new Date(entry.date);
+        const date = parseLocalDate(entry.date);
         const day = date.getDate();
         const monthYear = date.toLocaleString("default", {
           month: "short",
@@ -106,20 +108,20 @@ async function loadEntries() {
         });
 
         return `
-    <div class="entry-card" data-id="${entry._id}">
-      
+    <div class="entry-card" data-id="${escapeHtml(entry._id)}">
+
       <div class="entry-date">
         <span class="day">${day}</span>
         <span class="month">${monthYear}</span>
       </div>
 
       <div class="entry-content">
-        <div class="hours">${entry.hours} hours</div>
-        <div class="challenge">${entry.challenge}</div>
+        <div class="hours">${escapeHtml(entry.hours)} hours</div>
+        <div class="challenge">${escapeHtml(entry.challenge)}</div>
       </div>
 
       <div class="entry-intensity">
-        ${entry.intensity}
+        ${escapeHtml(entry.intensity)}
       </div>
 
     </div>
@@ -136,7 +138,9 @@ async function loadEntries() {
       });
     });
   } catch (error) {
+    if (requestId !== entriesRequestId) return;
     entriesLoading.style.display = "none";
+    entriesList.style.display = "flex";
     entriesList.textContent = "Something went wrong!";
   }
 }
@@ -144,13 +148,23 @@ closeEntryModal.addEventListener("click", function (element) {
   entryDetailsModal.style.display = "none";
 });
 deleteEntryButton.addEventListener("click", async function () {
-  if (confirm("Are you sure you want to delete this entry?")) {
-    await fetch(API_URL + "/" + selectedEntry._id, {
-      method: "DELETE",
-    });
+  if (!confirm("Are you sure you want to delete this entry?")) return;
+
+  deleteEntryButton.disabled = true;
+  try {
+    const result = await deleteEntryApi(selectedEntry._id);
+    if (!result.ok) {
+      alert("Could not delete the entry. Please try again.");
+      return;
+    }
     entryDetailsModal.style.display = "none";
     loadEntries();
+    updateHeatmapMonth();
     alert("Entry deleted successfully");
+  } catch (error) {
+    alert("Could not delete the entry. Check your connection and try again.");
+  } finally {
+    deleteEntryButton.disabled = false;
   }
 });
 
@@ -160,7 +174,10 @@ const currentMonthElement = document.getElementById("current-month");
 const previousMonthButton = document.getElementById("prev-month");
 const nextMonthButton = document.getElementById("next-month");
 const monthCarousel = document.getElementById("month-carousel");
-let activeMonth = new Date();
+// Always the 1st of the month, so setMonth() never overflows
+// (e.g. Oct 31 + 1 month would otherwise jump to Dec 1)
+const now = new Date();
+let activeMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 let startX = 0;
 let endX = 0;
 let startY = 0;
@@ -228,35 +245,54 @@ function renderHeatmap() {
   }
 }
 
+// Same idea as entriesRequestId: when months are switched quickly,
+// only the response for the month currently shown is rendered
+let heatmapRequestId = 0;
+const emptyStateTitle = document.querySelector(".heatmap-empty-title");
+const emptyStateText = document.querySelector(".heatmap-empty");
+
+function showHeatmapEmptyState(title, text) {
+  emptyStateTitle.textContent = title;
+  emptyStateText.textContent = text;
+  emptyState.style.display = "block";
+}
+
 async function loadHeatmapData() {
+  const requestId = ++heatmapRequestId;
   const month = activeMonth.getMonth();
   const year = activeMonth.getFullYear();
-  const response = await fetch(
-    API_URL + "?month=" + (month + 1) + "&year=" + year,
-  );
-  const data = await response.json();
-  const entries = data.data;
-  console.log("month/year", month + 1, year);
-  console.log("entries", entries);
+
+  let entries;
+  try {
+    const result = await loadEntriesApi({ month: month + 1, year });
+    entries = result.data.data || [];
+  } catch (error) {
+    if (requestId !== heatmapRequestId) return;
+    grid.style.display = "none";
+    showHeatmapEmptyState(
+      "Could not load data",
+      "Check your connection and try again.",
+    );
+    return;
+  }
+  if (requestId !== heatmapRequestId) return;
 
   if (entries.length > 0) {
     grid.style.display = "grid";
     emptyState.style.display = "none";
     entries.forEach(function (entry) {
-      const day = new Date(entry.date).getDate();
+      const day = parseLocalDate(entry.date).getDate();
       const daySquare = grid.children[day - 1];
+      if (!daySquare) return;
       daySquare.classList.add("level-" + entry.intensity);
-
       daySquare.entryData = entry;
-
-      console.log("entry", entry);
-      console.log("day", day);
-      console.log("intensity", entry.intensity);
-      console.log("daySquare", daySquare);
     });
   } else {
-    emptyState.style.display = "block";
     grid.style.display = "none";
+    showHeatmapEmptyState(
+      "No data yet",
+      "Start logging your daily work to see your progress here.",
+    );
   }
 
   let totalHoursSum = 0;

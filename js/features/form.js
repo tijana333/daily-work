@@ -9,6 +9,7 @@ import {
   validateHours,
   validateChallenge,
 } from "../utils/validators.js";
+import { toLocalDateString } from "../utils/helpers.js";
 
 const form = document.getElementById("entry-form");
 const dateElement = document.getElementById("date");
@@ -29,7 +30,7 @@ const buttons = document.querySelectorAll(".intensity-button");
 let editingEntryId = null;
 let intensity = 1;
 
-const todayDate = new Date().toISOString().substring(0, 10);
+const todayDate = toLocalDateString(new Date());
 const originalSubmitButtonText = submitBtnText.textContent;
 // SET LOADING
 function setLoading(isLoading) {
@@ -78,19 +79,10 @@ async function submitEntry(entry) {
     if (result.status === 201) {
       form.reset();
       dateElement.value = todayDate;
-      editingEntryId = null;
-      submitBtnText.textContent = "Save Entry";
-      intensity = 1;
+      clearEntryFields();
+      successMsg.textContent = "Entry created successfully!";
       successMsg.style.display = "block";
       serverError.style.display = "none";
-      buttons.forEach(function (button) {
-        const numberSpan = button.querySelector(".tab-number");
-        const spanValue = numberSpan.textContent;
-        button.classList.remove("active");
-        if (spanValue === "1") {
-          button.classList.add("active");
-        }
-      });
     } else {
       serverError.textContent = "Something went wrong!";
       serverError.style.display = "block";
@@ -100,60 +92,63 @@ async function submitEntry(entry) {
     setLoading(false);
   }
 }
-// START EDITING ENTRY
-export function startEditingEntry(entry) {
-  editingEntryId = entry._id;
-  submitBtnText.textContent = "Update Entry";
-
-  dateElement.value = entry.date;
-  hoursElement.value = entry.hours;
-  challengeElement.value = entry.challenge;
-  noteElement.value = entry.note || "";
-  intensity = entry.intensity;
-
-  buttons.forEach(function (intensityButton) {
-    intensityButton.classList.remove("active");
-    const numberSpan = intensityButton.querySelector(".tab-number");
-    if (numberSpan.textContent == entry.intensity) {
-      intensityButton.classList.add("active");
-    }
+// INTENSITY
+// Keeps the intensity variable and the active button in sync
+function setIntensity(value) {
+  intensity = Number(value);
+  buttons.forEach(function (button) {
+    const numberSpan = button.querySelector(".tab-number");
+    button.classList.toggle("active", Number(numberSpan.textContent) === intensity);
   });
 }
+
+// FILL / CLEAR FORM
+function fillEntryFields(entry) {
+  editingEntryId = entry._id;
+  submitBtnText.textContent = "Update Entry";
+  hoursElement.value = entry.hours ?? "";
+  challengeElement.value = entry.challenge || "";
+  noteElement.value = entry.note || "";
+  setIntensity(entry.intensity || 1);
+}
+
+// Clears everything except the date, so a date without an entry
+// doesn't keep the values from the previously selected date
+function clearEntryFields() {
+  editingEntryId = null;
+  submitBtnText.textContent = "Save Entry";
+  hoursElement.value = "";
+  challengeElement.value = "";
+  noteElement.value = "";
+  setIntensity(1);
+}
+
+// START EDITING ENTRY
+export function startEditingEntry(entry) {
+  dateElement.value = entry.date;
+  fillEntryFields(entry);
+}
+
 // LOAD ENTRY BY DATE
 async function loadEntryByDate(selectedDate) {
-  console.log("Selected date:", selectedDate);
-  const result = await loadEntryByDateApi(selectedDate);
-  console.log(result);
+  try {
+    const result = await loadEntryByDateApi(selectedDate);
 
-  if (result.status === 404) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const data = result.data;
-  if (!data.data[0]) {
-    editingEntryId = null;
-    submitBtnText.textContent = "Save Entry";
-    return;
-  }
-  const entry = data.data[0];
-  if (data.data[0]) {
-    editingEntryId = entry._id;
-    console.log("SET ID:", editingEntryId);
-    submitBtnText.textContent = "Update Entry";
-  }
-  console.log("ENTRY:", entry);
-  hoursElement.value = entry.hours || "";
-  challengeElement.value = entry.challenge;
-  noteElement.value = entry.note || "";
+    // The user picked another date while this request was running
+    if (dateElement.value !== selectedDate) return;
 
-  buttons.forEach(function (button) {
-    button.classList.remove("active");
-    const numberSpan = button.querySelector(".tab-number");
-    if (numberSpan.textContent == entry.intensity) {
-      button.classList.add("active");
+    const entry = result.status === 200 ? result.data.data?.[0] : null;
+    if (entry) {
+      fillEntryFields(entry);
+    } else {
+      clearEntryFields();
     }
-  });
+  } catch (error) {
+    clearEntryFields();
+    serverError.textContent = "Could not load the entry for this date";
+    serverError.style.display = "block";
+    successMsg.style.display = "none";
+  }
 }
 dateElement.addEventListener("change", function () {
   const isValid = validateDate(dateElement, dateError, todayDate);
@@ -216,23 +211,12 @@ form.addEventListener("submit", function (event) {
   }
 });
 // INTENSITY BUTTON
-buttons.forEach(function (button) {
-  const numberSpan = button.querySelector(".tab-number");
-  const spanValue = numberSpan.textContent;
-  if (spanValue === "1") {
-    button.classList.add("active");
-  }
-});
+setIntensity(1);
 
 buttons.forEach(function (button) {
-  button.addEventListener("click", function (element) {
-    buttons.forEach(function (btn) {
-      btn.classList.remove("active");
-    });
-    button.classList.add("active");
+  button.addEventListener("click", function () {
     const numberSpan = button.querySelector(".tab-number");
-    const buttonValue = numberSpan.textContent;
-    intensity = Number(buttonValue);
+    setIntensity(numberSpan.textContent);
   });
 });
 // INIT FORM
