@@ -161,7 +161,10 @@ const currentMonthElement = document.getElementById("current-month");
 const previousMonthButton = document.getElementById("prev-month");
 const nextMonthButton = document.getElementById("next-month");
 const monthCarousel = document.getElementById("month-carousel");
-let activeMonth = new Date();
+// Always the 1st of the month, so setMonth() never overflows
+// (e.g. Oct 31 + 1 month would otherwise jump to Dec 1)
+const now = new Date();
+let activeMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 let startX = 0;
 let endX = 0;
 let startY = 0;
